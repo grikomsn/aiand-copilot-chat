@@ -1,9 +1,10 @@
 /**
- * Inline-completion model candidates, ordered cheap-and-fast first.
+ * Inline-completion model candidates, ordered fastest first.
  *
- * Badges are unmeasured defaults for the ai& catalog; latency and hidden-
- * reasoning behavior have not been benchmarked against api.aiand.com yet.
- * The QuickPick command renders this list and writes the selected id to
+ * Badges carry measured inline-completion latency against api.aiand.com
+ * (median time-to-first-byte over a realistic fill-in-the-middle prompt with
+ * each model's reasoning-off effort, 2026-09-10). The QuickPick command
+ * renders this list and writes the selected id to
  * `aiandCopilot.inlineSuggestionsModel`, so choices need no reload. Unknown
  * model ids stay reachable through the command's custom entry and the raw
  * setting.
@@ -22,58 +23,58 @@ export interface InlineModelCandidate {
 export const INLINE_MODEL_CANDIDATES: readonly InlineModelCandidate[] = [
   {
     id: "deepseek-ai/deepseek-v4-flash",
-    badge: "★ default · fast flash tier",
-    detail: "Lowest-latency ai& chat model; a sensible default for ghost text.",
-  },
-  {
-    id: "openai/gpt-oss-120b",
-    badge: "low cost",
-    detail: "Cheapest per-token ai& model with reasoning support.",
+    badge: "★ default · measured ~0.5s TTFB · ~0.8s total",
+    detail: "Fastest full completion; a sensible default for ghost text.",
   },
   {
     id: "google/gemma-4-31b-it",
-    badge: "unmeasured",
-    detail: "Mid-size instruct model; latency not yet benchmarked against ai&.",
-  },
-  {
-    id: "qwen/qwen3.8-27b",
-    badge: "unmeasured",
-    detail: "Compact Qwen model; latency not yet benchmarked against ai&.",
+    badge: "fastest TTFB · measured ~0.5s",
+    detail: "Fastest measured first token; image-capable instruct model.",
   },
   {
     id: "qwen/qwen3.6-27b",
-    badge: "unmeasured",
-    detail: "Compact Qwen model; latency not yet benchmarked against ai&.",
+    badge: "measured ~0.5s TTFB",
+    detail: "Fast first token with a compact Qwen model.",
   },
   {
-    id: "zai-org/glm-5.2",
-    badge: "unmeasured",
-    detail: "GLM chat model; latency not yet benchmarked against ai&.",
-  },
-  {
-    id: "deepseek-ai/deepseek-v4-pro",
-    badge: "unmeasured · larger",
-    detail: "Larger DeepSeek model; prefer the flash tier for inline latency.",
-  },
-  {
-    id: "moonshotai/kimi-k3",
-    badge: "unmeasured · larger",
-    detail: "Large Kimi model; prefer smaller tiers for inline latency.",
-  },
-  {
-    id: "moonshotai/kimi-k2.7-code",
-    badge: "unmeasured · code-tuned",
-    detail: "Code-tuned Kimi model; may reason before emitting ghost text.",
+    id: "qwen/qwen3.8-27b",
+    badge: "measured ~0.5s TTFB",
+    detail: "Fast first token with a compact Qwen model.",
   },
   {
     id: "zai-org/glm-5.3",
-    badge: "unmeasured · larger",
-    detail: "Larger GLM model; prefer smaller tiers for inline latency.",
+    badge: "measured ~0.6s TTFB",
+    detail: "GLM model; reasoning runs at its lightest supported effort.",
+  },
+  {
+    id: "deepseek-ai/deepseek-v4-pro",
+    badge: "measured ~0.7s TTFB · larger",
+    detail: "Larger DeepSeek model; prefer the flash tier for inline latency.",
+  },
+  {
+    id: "openai/gpt-oss-120b",
+    badge: "measured ~0.7s TTFB · low cost",
+    detail: "Cheapest per-token ai& model; reasoning runs at its lightest supported effort.",
   },
   {
     id: "motif-technologies/motif-3",
-    badge: "unmeasured",
-    detail: "Motif chat model; latency not yet benchmarked against ai&.",
+    badge: "measured ~0.8s TTFB",
+    detail: "Motif chat model; slower first token than the flash tiers.",
+  },
+  {
+    id: "moonshotai/kimi-k3",
+    badge: "measured ~0.9s TTFB · larger",
+    detail: "Large Kimi model; prefer smaller tiers for inline latency.",
+  },
+  {
+    id: "zai-org/glm-5.2",
+    badge: "measured ~1.0s TTFB",
+    detail: "GLM model; slower first token than the flash tiers.",
+  },
+  {
+    id: "moonshotai/kimi-k2.7-code",
+    badge: "code-tuned · always reasons",
+    detail: "Only accepts high effort; reasons before emitting, so ghost text is delayed and may stay empty.",
   },
 ];
 

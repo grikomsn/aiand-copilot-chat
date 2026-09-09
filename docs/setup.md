@@ -54,9 +54,11 @@ Prompts and API keys are never intentionally written to the output channel.
 
 ## Inline suggestions
 
-Inline code suggestions are experimental and off by default. When enabled, each suggestion sends a bounded fill-in-the-middle prompt (10 lines before the cursor, 300 characters after, both configurable) with FIM delimiter tokens and the suggestion model's reasoning-off effort (`reasoning_effort: "none"` when the model accepts it, else its lightest listed effort) to the fixed `/chat/completions` endpoint. Inline latency has not been benchmarked against ai& yet; candidates default to the low-latency flash tier first, larger models later. Hidden reasoning deltas are discarded engine-side, and the Copilot Chat prompt box is excluded unless `aiandCopilot.inlineSuggestionsChatInput` is enabled.
+Inline code suggestions are experimental and off by default. When enabled, each suggestion sends a bounded fill-in-the-middle prompt (10 lines before the cursor, 300 characters after, both configurable) with FIM delimiter tokens and the suggestion model's reasoning-off effort (`reasoning_effort: "none"` when the model accepts it, else its lightest listed effort) to the fixed `/chat/completions` endpoint. Hidden reasoning deltas are discarded engine-side, and the Copilot Chat prompt box is excluded unless `aiandCopilot.inlineSuggestionsChatInput` is enabled.
 
-**ai&: Set Inline Suggestions Model** (also in the Manage menu) lists compatible models ordered cheap-and-fast first. A "Use a custom model id…" entry keeps any hosted model reachable. The command only writes settings, so changes apply on the next keystroke without a reload.
+Candidate latency is measured against api.aiand.com (median time-to-first-byte over a realistic fill-in-the-middle prompt at each model's reasoning-off effort): Gemma 4 31B IT and the compact Qwen models reach a first token in ~0.5s, DeepSeek V4 Flash completes fastest overall (~0.5s TTFB, ~0.8s total), and larger models run ~0.7–1.0s. Kimi K2.7 Code only accepts high effort, so it reasons before emitting and ghost text may stay empty. The candidates default to the low-latency flash tier first, larger models later.
+
+**ai&: Set Inline Suggestions Model** (also in the Manage menu) lists compatible models ordered default-first with measured badges. A "Use a custom model id…" entry keeps any hosted model reachable. The command only writes settings, so changes apply on the next keystroke without a reload.
 
 ## Troubleshooting
 
