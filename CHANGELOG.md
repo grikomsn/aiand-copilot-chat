@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- 18abd3a: Show the live ai& organization credit balance alongside locally tracked inference usage.
+
 ## 0.1.0
 
 ### Minor Changes
