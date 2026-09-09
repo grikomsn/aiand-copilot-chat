@@ -46,7 +46,7 @@ export class ChatCompletionEngine {
 
   async complete(context: CompletionContext, signal: AbortSignal): Promise<CompletionResult> {
     const started = Date.now();
-    const prompt = buildCompletionPrompt(context.prefix, context.suffix);
+    const prompt = buildCompletionPrompt(context.prefix, context.suffix, context.reasoningEfforts);
     const body = JSON.stringify({
       model: context.modelId,
       messages: prompt.messages,

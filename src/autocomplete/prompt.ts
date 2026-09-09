@@ -13,7 +13,7 @@
 
 export interface CompletionPrompt {
   readonly messages: ReadonlyArray<{ role: string; content: string }>;
-  /** Extra body fields (the reasoning-off switch). */
+  /** Extra body fields (the reasoning-off switch, when the model accepts one). */
   readonly extra: Readonly<Record<string, unknown>>;
 }
 
@@ -23,13 +23,29 @@ export const INLINE_REASONING_EFFORT = "none";
 
 const FIM = { prefix: "<|fim_prefix|>", suffix: "<|fim_suffix|>", middle: "<|fim_middle|>" } as const;
 
-export function buildCompletionPrompt(prefix: string, suffix: string): CompletionPrompt {
+/**
+ * Picks the reasoning-off effort a model accepts for inline completions.
+ * "none" is preferred; models without it use their lightest listed effort, and
+ * models with no reasoning control omit the field entirely.
+ */
+export function completionReasoningEffort(efforts: readonly string[] | undefined): string | undefined {
+  if (!efforts?.length) return undefined;
+  if (efforts.includes(INLINE_REASONING_EFFORT)) return INLINE_REASONING_EFFORT;
+  return efforts[0];
+}
+
+export function buildCompletionPrompt(
+  prefix: string,
+  suffix: string,
+  efforts?: readonly string[],
+): CompletionPrompt {
+  const effort = completionReasoningEffort(efforts);
   return {
     messages: [
       { role: "system", content: COMPLETION_SYSTEM_PROMPT },
       { role: "user", content: `${FIM.prefix}${prefix}${FIM.suffix}${suffix}${FIM.middle}` },
     ],
-    extra: { reasoning_effort: INLINE_REASONING_EFFORT },
+    extra: effort ? { reasoning_effort: effort } : {},
   };
 }
 

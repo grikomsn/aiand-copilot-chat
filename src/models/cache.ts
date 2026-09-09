@@ -13,6 +13,8 @@ export function parseCatalogSnapshots(value: unknown): Record<string, AiandModel
 
 function validModel(value: unknown): value is AiandModelMetadata {
   if (!record(value)) return false;
+  const reasoningOk = value.reasoningEfforts === undefined
+    || (Array.isArray(value.reasoningEfforts) && value.reasoningEfforts.every((e) => typeof e === "string"));
   return (
     typeof value.id === "string" &&
     Boolean(value.id) &&
@@ -22,7 +24,7 @@ function validModel(value: unknown): value is AiandModelMetadata {
     positive(value.maxOutputTokens) &&
     typeof value.imageInput === "boolean" &&
     typeof value.toolCalling === "boolean" &&
-    typeof value.reasoningEffort === "boolean"
+    reasoningOk
   );
 }
 

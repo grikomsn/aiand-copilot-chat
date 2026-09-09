@@ -20,6 +20,8 @@ export interface InlineCompletionProviderOptions {
   isEnabled: () => boolean;
   /** The model id used for suggestions (config-driven). */
   resolveModelId: () => string;
+  /** Reasoning efforts the suggestion model accepts; picks a valid reasoning-off value. */
+  resolveReasoningEfforts?: (modelId: string) => readonly string[] | undefined;
   /** Whether suggestions are allowed inside the chat prompt box (opt-in). */
   resolveChatInputEnabled: () => boolean;
   resolveDebounceMs: () => number;
@@ -93,6 +95,7 @@ export class AiandInlineCompletionProvider implements vscode.InlineCompletionIte
             suffix,
             modelId,
             maxTokens: this.options.resolveMaxTokens(),
+            reasoningEfforts: this.options.resolveReasoningEfforts?.(modelId),
           };
           const result = await this.options.engine.complete(request, signal);
           if (!result.text || token.isCancellationRequested || signal.aborted) {

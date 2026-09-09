@@ -1,33 +1,75 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  DEFAULT_REASONING_EFFORT,
-  REASONING_EFFORTS,
   applyReasoningEffort,
   buildModelConfigurationSchema,
   contextSizeOptions,
+  modelEffortSpec,
   resolveContextCap,
   resolveContextSize,
   resolveReasoningEffort,
+  type ModelEffortSpec,
 } from "./options";
 
-test("exposes ai& reasoning efforts in the model picker", () => {
-  const schema = buildModelConfigurationSchema("medium");
-  assert.deepEqual(schema?.properties.reasoningEffort.enum, REASONING_EFFORTS);
-  assert.deepEqual(schema?.properties.reasoningEffort.enumItemLabels, ["None", "Low", "Medium", "High"]);
+const STANDARD: ModelEffortSpec = { efforts: ["low", "medium", "high"], defaultEffort: "medium" };
+const TOGGLE: ModelEffortSpec = { efforts: ["none", "high"], defaultEffort: "high" };
+const WITH_MAX: ModelEffortSpec = { efforts: ["none", "high", "max"], defaultEffort: "max" };
+
+test("builds an effort spec from a model's supported list and default", () => {
+  assert.deepEqual(modelEffortSpec(["low", "high"], "high"), { efforts: ["low", "high"], defaultEffort: "high" });
+  assert.deepEqual(modelEffortSpec(["none", "high", "max"], "max"), WITH_MAX);
+  assert.equal(modelEffortSpec([], undefined), undefined);
+  assert.equal(modelEffortSpec(undefined, undefined), undefined);
+});
+
+test("effort spec ignores unsupported values and falls back to the last listed effort", () => {
+  assert.deepEqual(modelEffortSpec(["low", "bogus" as never, "high"], undefined), {
+    efforts: ["low", "high"],
+    defaultEffort: "high",
+  });
+});
+
+test("exposes the model's own reasoning efforts in the model picker", () => {
+  const schema = buildModelConfigurationSchema(STANDARD);
+  assert.deepEqual(schema?.properties.reasoningEffort.enum, ["low", "medium", "high"]);
+  assert.deepEqual(schema?.properties.reasoningEffort.enumItemLabels, ["Low", "Medium", "High"]);
   assert.equal(schema?.properties.reasoningEffort.default, "medium");
   assert.equal(schema?.properties.reasoningEffort.group, "navigation");
 });
 
-test("per-request effort overrides the workspace default", () => {
-  assert.equal(resolveReasoningEffort({ reasoningEffort: "low" }, "high"), "low");
-  assert.equal(resolveReasoningEffort({ thinkingEffort: "medium" }, "high"), "medium");
-  assert.equal(resolveReasoningEffort(undefined, "none"), "none");
+test("labels and describes max and xhigh efforts", () => {
+  const schema = buildModelConfigurationSchema({
+    efforts: ["none", "low", "medium", "xhigh", "max"],
+    defaultEffort: "medium",
+  });
+  assert.deepEqual(schema?.properties.reasoningEffort.enumItemLabels, [
+    "None",
+    "Low",
+    "Medium",
+    "Extra High",
+    "Max",
+  ]);
 });
 
-test("unsupported effort safely falls back to high", () => {
-  assert.equal(resolveReasoningEffort({ reasoningEffort: "max" }, "none"), DEFAULT_REASONING_EFFORT);
-  assert.equal(resolveReasoningEffort(undefined, "invalid"), DEFAULT_REASONING_EFFORT);
+test("per-request effort overrides the workspace default within the model's list", () => {
+  assert.equal(resolveReasoningEffort(STANDARD, { reasoningEffort: "low" }, "high"), "low");
+  assert.equal(resolveReasoningEffort(STANDARD, { thinkingEffort: "medium" }, "high"), "medium");
+  assert.equal(resolveReasoningEffort(TOGGLE, undefined, "high"), "high");
+});
+
+test("an effort the model does not support falls back to the model's own default", () => {
+  // qwen3.8 supports none/low/medium/xhigh but not high → resolves to its own default.
+  const qwen = modelEffortSpec(["none", "low", "medium", "xhigh"], "medium")!;
+  assert.equal(resolveReasoningEffort(qwen, { reasoningEffort: "high" }, "high"), "medium");
+  // deepseek-flash has no medium → falls back to its own default ("none").
+  const flash = modelEffortSpec(["none", "high", "max"], "none")!;
+  assert.equal(resolveReasoningEffort(flash, undefined, "medium"), "none");
+  assert.equal(resolveReasoningEffort(flash, { reasoningEffort: "max" }, "medium"), "max");
+});
+
+test("models without reasoning control resolve no effort and omit the parameter", () => {
+  assert.equal(resolveReasoningEffort(undefined, { reasoningEffort: "high" }, "high"), undefined);
+  assert.deepEqual(applyReasoningEffort({ model: "m" }, undefined), { model: "m" });
 });
 
 test("sends ai&'s documented reasoning_effort parameter", () => {
@@ -35,9 +77,9 @@ test("sends ai&'s documented reasoning_effort parameter", () => {
     model: "glm-5.2",
     reasoning_effort: "none",
   });
-  assert.deepEqual(applyReasoningEffort({ model: "glm-5.2" }, "high"), {
+  assert.deepEqual(applyReasoningEffort({ model: "glm-5.2" }, "max"), {
     model: "glm-5.2",
-    reasoning_effort: "high",
+    reasoning_effort: "max",
   });
 });
 
@@ -63,8 +105,8 @@ test("reads the context size from picker configuration", () => {
 });
 
 test("exposes the Context Window control with and without reasoning controls", () => {
-  const combined = buildModelConfigurationSchema("medium", contextSizeOptions(1_048_576));
-  assert.deepEqual(combined?.properties.reasoningEffort.enum, REASONING_EFFORTS);
+  const combined = buildModelConfigurationSchema(STANDARD, contextSizeOptions(1_048_576));
+  assert.deepEqual(combined?.properties.reasoningEffort.enum, ["low", "medium", "high"]);
   assert.deepEqual(combined?.properties.contextSize.enum, ["auto", 65_536, 131_072, 200_000, 1_048_576]);
   assert.equal(combined?.properties.contextSize.default, "auto");
   assert.equal(combined?.properties.contextSize.group, "tokens");

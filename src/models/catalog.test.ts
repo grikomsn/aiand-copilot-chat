@@ -48,7 +48,8 @@ test("provides documented fallback limits", () => {
     maxOutputTokens: 131_072,
     imageInput: false,
     toolCalling: true,
-    reasoningEffort: true,
+    reasoningEfforts: ["none", "high", "max"],
+    defaultReasoningEffort: "max",
     cost: { input: 1, output: 4 },
   });
   assert.deepEqual(getModelMetadata("google/gemma-4-31b-it"), {
@@ -59,7 +60,8 @@ test("provides documented fallback limits", () => {
     maxOutputTokens: 262_144,
     imageInput: true,
     toolCalling: true,
-    reasoningEffort: true,
+    reasoningEfforts: ["none", "high"],
+    defaultReasoningEffort: "none",
     cost: { input: 0.2, output: 0.5 },
   });
   assert.equal(formatTokenLimit(1_000_000), "1M");
@@ -88,28 +90,46 @@ test("uses exactly the discovered catalog and advertised metadata", () => {
         maxOutputTokens: 64_000,
         imageInput: true,
         toolCalling: true,
-        reasoningEffort: false,
         cost: undefined,
       },
     ],
   );
 });
 
-test("uses live capability flags and official reasoning fallbacks", () => {
+test("reads live reasoning_efforts and reasoning_effort_default verbatim", () => {
   const [live] = orderModelMetadata([
     {
       id: "zai-org/glm-5.2",
       tool_calling: false,
-      reasoning_effort: false,
+      reasoning_efforts: ["none", "high", "max"],
+      reasoning_effort_default: "max",
       created: 1_700_000_000,
     },
   ]);
   assert.equal(live.toolCalling, false);
-  assert.equal(live.reasoningEffort, false);
+  assert.deepEqual(live.reasoningEfforts, ["none", "high", "max"]);
+  assert.equal(live.defaultReasoningEffort, "max");
   assert.equal(live.releaseDate, "2023-11-14");
-  assert.equal(getModelMetadata("google/gemma-4-31b-it").reasoningEffort, true);
-  assert.equal(getModelMetadata("moonshotai/kimi-k2.7-code").reasoningEffort, true);
-  assert.equal(getModelMetadata("some-unknown-model").reasoningEffort, false);
+});
+
+test("falls back to per-model reasoning efforts when the live catalog omits them", () => {
+  assert.deepEqual(getModelMetadata("google/gemma-4-31b-it").reasoningEfforts, ["none", "high"]);
+  assert.deepEqual(getModelMetadata("moonshotai/kimi-k2.7-code").reasoningEfforts, ["high"]);
+  assert.equal(getModelMetadata("moonshotai/kimi-k2.7-code").defaultReasoningEffort, "high");
+  assert.equal(getModelMetadata("some-unknown-model").reasoningEfforts, undefined);
+});
+
+test("ignores a live default the model does not list and keeps the model default", () => {
+  const [live] = orderModelMetadata([
+    {
+      id: "qwen/qwen3.8-27b",
+      capabilities: ["reasoning"],
+      reasoning_efforts: ["none", "low", "medium", "xhigh"],
+      reasoning_effort_default: "high", // not in the list → keep model default
+    },
+  ]);
+  assert.deepEqual(live.reasoningEfforts, ["none", "low", "medium", "xhigh"]);
+  assert.equal(live.defaultReasoningEffort, "medium");
 });
 
 test("reads ai& capabilities arrays and per-million pricing", () => {
@@ -124,7 +144,8 @@ test("reads ai& capabilities arrays and per-million pricing", () => {
   ]);
   assert.equal(live.imageInput, true);
   assert.equal(live.toolCalling, true);
-  assert.equal(live.reasoningEffort, true);
+  // capabilities advertise reasoning but no explicit list → fallback efforts apply.
+  assert.deepEqual(live.reasoningEfforts, ["none", "high"]);
   assert.deepEqual(live.cost, { input: 0.2, output: 0.5 });
 });
 
@@ -173,8 +194,22 @@ test("uses the official display name when ai& reuses a colliding raw name", () =
   ]);
   assert.equal(live.id, "openai/gpt-oss-120b");
   assert.equal(live.name, "GPT OSS 120B");
-  assert.equal(live.reasoningEffort, true);
+  assert.deepEqual(live.reasoningEfforts, ["low", "medium", "high"]);
+  assert.equal(live.defaultReasoningEffort, "medium");
   assert.equal(live.imageInput, false);
+});
+
+test("models.dev enrichment never widens an authoritative live effort list", () => {
+  // Live catalog says gpt-oss-120b accepts low/medium/high only.
+  const [live] = orderModelMetadata([
+    { id: "openai/gpt-oss-120b", reasoning_efforts: ["low", "medium", "high"], reasoning_effort_default: "medium" },
+  ]);
+  const enriched = enrichModelMetadata(live, {
+    id: "openai/gpt-oss-120b",
+    reasoningOptions: ["low", "medium", "high", "xhigh"],
+  });
+  assert.deepEqual(enriched.reasoningEfforts, ["low", "medium", "high"]);
+  assert.equal(enriched.defaultReasoningEffort, "medium");
 });
 
 test("falls back only when discovery returns no chat models", () => {

@@ -32,10 +32,13 @@ import {
   INLINE_TIMEOUT_MS_SETTING,
 } from "./config";
 import { aiandHeaders, AIAND_ENDPOINTS, extensionUserAgent } from "../transport/protocol";
+import { getModelMetadata } from "../models/catalog";
 
 export interface InlineCompletionsDeps {
   /** Resolve the stored API key; undefined when signed out. */
   readonly resolveApiKey: () => Promise<string | undefined>;
+  /** Resolve the reasoning efforts a suggestion model accepts (live catalog → fallback). */
+  readonly resolveReasoningEfforts?: (modelId: string) => readonly string[] | undefined;
   readonly output: vscode.OutputChannel;
   readonly version: string;
   readonly vscodeVersion: string;
@@ -75,6 +78,8 @@ export function registerInlineCompletions(context: vscode.ExtensionContext, deps
     engine,
     isEnabled: () => readSetting(INLINE_SUGGESTIONS_SETTING, false),
     resolveModelId: () => readSetting(INLINE_SUGGESTIONS_MODEL_SETTING, DEFAULT_INLINE_MODEL),
+    resolveReasoningEfforts: (modelId) =>
+      deps.resolveReasoningEfforts?.(modelId) ?? getModelMetadata(modelId).reasoningEfforts,
     resolveChatInputEnabled: () => readSetting(INLINE_SUGGESTIONS_CHAT_INPUT_SETTING, DEFAULT_INLINE_SUGGESTIONS_CHAT_INPUT),
     resolveDebounceMs: () => readNumberSetting(INLINE_DEBOUNCE_MS_SETTING, DEFAULT_INLINE_DEBOUNCE_MS, 50, 2_000),
     resolveMaxTokens: () => readNumberSetting(INLINE_MAX_TOKENS_SETTING, DEFAULT_INLINE_MAX_TOKENS, 16, 1_024),

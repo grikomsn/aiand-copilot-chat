@@ -5,6 +5,8 @@ export interface CompletionContext {
   readonly suffix: string;
   readonly modelId: string;
   readonly maxTokens: number;
+  /** Reasoning efforts the model accepts; used to pick a valid reasoning-off value. */
+  readonly reasoningEfforts?: readonly string[];
 }
 
 export interface CompletionResult {

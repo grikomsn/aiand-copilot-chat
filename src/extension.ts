@@ -41,6 +41,7 @@ export function activate(context: vscode.ExtensionContext): void {
     ...registerCommands(auth, provider, output),
     registerInlineCompletions(context, {
       resolveApiKey: () => auth.getApiKey(),
+      resolveReasoningEfforts: (modelId) => provider.reasoningEffortsFor(modelId),
       output,
       version: context.extension.packageJSON.version as string,
       vscodeVersion: vscode.version,

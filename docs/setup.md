@@ -34,7 +34,7 @@ Provider-entry discovery uses `https://api.aiand.com/v1/models`. Models added to
 
 | Setting | Default | Purpose |
 | --- | ---: | --- |
-| `aiandCopilot.reasoningEffort` | `high` | Default ai& reasoning effort (`none`, `low`, `medium`, or `high`) |
+| `aiandCopilot.reasoningEffort` | `high` | Workspace default reasoning effort. Applied only when the selected model supports it; otherwise the model's own default is used. Each model's picker lists only the efforts it accepts (`none`/`low`/`medium`/`high`/`xhigh`/`max`). |
 | `aiandCopilot.maxOutputTokens` | `0` | Output limit; `0` reserves up to 32,768 response tokens |
 | `aiandCopilot.requestTimeoutSeconds` | `600` | Total inference timeout in seconds |
 | `aiandCopilot.streamIdleTimeoutSeconds` | `120` | Maximum time without streamed data |
@@ -54,7 +54,7 @@ Prompts and API keys are never intentionally written to the output channel.
 
 ## Inline suggestions
 
-Inline code suggestions are experimental and off by default. When enabled, each suggestion sends a bounded fill-in-the-middle prompt (10 lines before the cursor, 300 characters after, both configurable) with FIM delimiter tokens and `reasoning_effort: "none"` to the fixed `/chat/completions` endpoint. Inline latency has not been benchmarked against ai& yet; candidates default to the low-latency flash tier first, larger models later. Hidden reasoning deltas are discarded engine-side, and the Copilot Chat prompt box is excluded unless `aiandCopilot.inlineSuggestionsChatInput` is enabled.
+Inline code suggestions are experimental and off by default. When enabled, each suggestion sends a bounded fill-in-the-middle prompt (10 lines before the cursor, 300 characters after, both configurable) with FIM delimiter tokens and the suggestion model's reasoning-off effort (`reasoning_effort: "none"` when the model accepts it, else its lightest listed effort) to the fixed `/chat/completions` endpoint. Inline latency has not been benchmarked against ai& yet; candidates default to the low-latency flash tier first, larger models later. Hidden reasoning deltas are discarded engine-side, and the Copilot Chat prompt box is excluded unless `aiandCopilot.inlineSuggestionsChatInput` is enabled.
 
 **ai&: Set Inline Suggestions Model** (also in the Manage menu) lists compatible models ordered cheap-and-fast first. A "Use a custom model id…" entry keeps any hosted model reachable. The command only writes settings, so changes apply on the next keystroke without a reload.
 

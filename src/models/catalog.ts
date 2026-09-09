@@ -1,5 +1,6 @@
 import { aiandModelCost, modelCostFromApi, type ModelCost } from "./pricing";
 import type { ModelsDevModelMetadata } from "./metadata";
+import type { ReasoningEffort } from "./options";
 
 export const FALLBACK_MODELS = [
   "openai/gpt-oss-120b",
@@ -18,19 +19,28 @@ export const FALLBACK_MODELS = [
 export const DEFAULT_MAX_INPUT_TOKENS = 262_144;
 export const DEFAULT_MAX_OUTPUT_TOKENS = 131_072;
 
-const OFFICIAL_REASONING_EFFORT_MODELS = new Set([
-  "openai/gpt-oss-120b",
-  "deepseek-ai/deepseek-v4-flash",
-  "deepseek-ai/deepseek-v4-pro",
-  "moonshotai/kimi-k3",
-  "moonshotai/kimi-k2.7-code",
-  "zai-org/glm-5.3",
-  "zai-org/glm-5.2",
-  "google/gemma-4-31b-it",
-  "qwen/qwen3.8-27b",
-  "qwen/qwen3.6-27b",
-  "motif-technologies/motif-3",
-]);
+/**
+ * Fallback per-model reasoning efforts captured from the live ai& catalog
+ * (`GET /v1/models` `reasoning_efforts` / `reasoning_effort_default`).
+ * The live response stays authoritative; these keep the picker accurate when
+ * the catalog is unavailable. Models absent here have no reasoning control.
+ */
+const FALLBACK_REASONING_EFFORTS: Readonly<Record<string, {
+  readonly efforts: readonly ReasoningEffort[];
+  readonly defaultEffort: ReasoningEffort;
+}>> = {
+  "openai/gpt-oss-120b": { efforts: ["low", "medium", "high"], defaultEffort: "medium" },
+  "deepseek-ai/deepseek-v4-flash": { efforts: ["none", "high", "max"], defaultEffort: "none" },
+  "deepseek-ai/deepseek-v4-pro": { efforts: ["none", "high", "max"], defaultEffort: "none" },
+  "moonshotai/kimi-k3": { efforts: ["low", "high", "max"], defaultEffort: "max" },
+  "moonshotai/kimi-k2.7-code": { efforts: ["high"], defaultEffort: "high" },
+  "zai-org/glm-5.3": { efforts: ["low", "high", "max"], defaultEffort: "max" },
+  "zai-org/glm-5.2": { efforts: ["none", "high", "max"], defaultEffort: "max" },
+  "google/gemma-4-31b-it": { efforts: ["none", "high"], defaultEffort: "none" },
+  "qwen/qwen3.8-27b": { efforts: ["none", "low", "medium", "xhigh"], defaultEffort: "medium" },
+  "qwen/qwen3.6-27b": { efforts: ["none", "high"], defaultEffort: "high" },
+  "motif-technologies/motif-3": { efforts: ["none", "high"], defaultEffort: "high" },
+};
 
 export interface AiandModelMetadata {
   readonly id: string;
@@ -40,7 +50,10 @@ export interface AiandModelMetadata {
   readonly maxOutputTokens: number;
   readonly imageInput: boolean;
   readonly toolCalling: boolean;
-  readonly reasoningEffort: boolean;
+  /** Reasoning efforts the model accepts; undefined when it has no reasoning control. */
+  readonly reasoningEfforts?: readonly ReasoningEffort[];
+  /** The model's own default reasoning effort; must be a member of reasoningEfforts. */
+  readonly defaultReasoningEffort?: ReasoningEffort;
   readonly description?: string;
   readonly releaseDate?: string;
   readonly cost?: ModelCost;
@@ -66,6 +79,7 @@ export interface AiandApiModel {
   readonly tool_call?: unknown;
   readonly reasoning_effort?: unknown;
   readonly reasoning_efforts?: unknown;
+  readonly reasoning_effort_default?: unknown;
   readonly custom_reasoning?: unknown;
   readonly description?: unknown;
   readonly created?: unknown;
@@ -154,17 +168,33 @@ export function enrichModelMetadata(
   metadata: ModelsDevModelMetadata | undefined,
 ): AiandModelMetadata {
   if (!metadata) return model;
+  // models.dev reasoning options enrich only models the live catalog left
+  // without an effort list; they never widen an authoritative live list.
+  const reasoningEfforts = model.reasoningEfforts ?? normalizeReasoningEfforts(metadata.reasoningOptions);
   return {
     ...model,
     contextLength: model.contextLength || metadata.contextLength || DEFAULT_MAX_INPUT_TOKENS,
     maxOutputTokens: model.maxOutputTokens || metadata.maxOutputTokens || DEFAULT_MAX_OUTPUT_TOKENS,
     imageInput: model.imageInput || metadata.imageInput === true,
     toolCalling: metadata.toolCalling ?? model.toolCalling,
-    reasoningEffort: metadata.reasoningOptions?.includes("low") === true || model.reasoningEffort,
+    ...(reasoningEfforts ? { reasoningEfforts } : {}),
+    ...(reasoningEfforts
+      ? { defaultReasoningEffort: model.defaultReasoningEffort ?? reasoningEfforts.at(-1) }
+      : {}),
     description: model.description ?? metadata.description,
     releaseDate: model.releaseDate ?? metadata.releaseDate,
   };
 }
+
+/** Maps external reasoning-option strings onto the canonical ReasoningEffort list, preserving order. */
+function normalizeReasoningEfforts(value: readonly string[] | undefined): ReasoningEffort[] | undefined {
+  if (!value?.length) return undefined;
+  const result = value.filter((entry): entry is ReasoningEffort =>
+    (REASONING_EFFORTS_LIST as readonly string[]).includes(entry));
+  return result.length ? result : undefined;
+}
+
+const REASONING_EFFORTS_LIST: readonly ReasoningEffort[] = ["none", "low", "medium", "high", "xhigh", "max"];
 
 export function formatTokenLimit(tokens: number): string {
   if (tokens >= 1_000_000) return `${Math.round(tokens / 100_000) / 10}M`;
@@ -216,6 +246,19 @@ function modelMetadataFromApi(raw: AiandApiModel): AiandModelMetadata | undefine
   const rawName = typeof raw.name === "string" ? raw.name : "";
   const apiName = rawName.trim().replace(/^ai&:\s*/i, "").trim();
   const capabilitySet = new Set((capabilities ?? []).map((value) => value.toLowerCase()));
+  // The live reasoning_efforts list is authoritative for what the model accepts.
+  const liveEfforts = normalizeReasoningEfforts(stringArray(raw.reasoning_efforts));
+  const reasoningEfforts = liveEfforts ?? fallback.reasoningEfforts;
+  const liveDefault = isReasoningEffortValue(raw.reasoning_effort_default)
+    ? raw.reasoning_effort_default
+    : undefined;
+  const defaultReasoningEffort = liveDefault && reasoningEfforts?.includes(liveDefault)
+    ? liveDefault
+    : fallback.defaultReasoningEffort;
+  const hasReasoning = reasoningEfforts !== undefined
+    || (capabilitySet.size
+      ? capabilitySet.has("reasoning")
+      : (boolean(raw.reasoning_effort ?? raw.custom_reasoning) ?? Boolean(fallback.reasoningEfforts)));
   return {
     id,
     name: OFFICIAL_MODEL_NAMES[id] ?? (apiName || fallback.name),
@@ -232,18 +275,22 @@ function modelMetadataFromApi(raw: AiandApiModel): AiandModelMetadata | undefine
       (capabilitySet.size ? capabilitySet.has("tool_calling") : undefined)
       ?? boolean(raw.tool_calling ?? raw.tool_call)
       ?? fallback.toolCalling,
-    reasoningEffort:
-      (capabilitySet.size ? capabilitySet.has("reasoning") : undefined)
-      ?? boolean(raw.reasoning_effort ?? raw.custom_reasoning)
-      ?? (stringArray(raw.reasoning_efforts)?.length ? true : undefined)
-      ?? fallback.reasoningEffort,
+    ...(hasReasoning && reasoningEfforts?.length ? { reasoningEfforts } : {}),
+    ...(hasReasoning && reasoningEfforts?.length && defaultReasoningEffort
+      ? { defaultReasoningEffort }
+      : {}),
     ...(typeof raw.description === "string" && raw.description.trim() ? { description: raw.description.trim() } : {}),
     ...(unixDate(raw.created) ? { releaseDate: unixDate(raw.created) } : {}),
     cost: aiandModelCost(id, modelCostFromApi(raw.pricing ?? pickPerMillionPricing(raw))),
   };
 }
 
+function isReasoningEffortValue(value: unknown): value is ReasoningEffort {
+  return typeof value === "string" && (REASONING_EFFORTS_LIST as readonly string[]).includes(value);
+}
+
 function model(id: string, contextLength: number, maxOutputTokens: number, imageInput = false): AiandModelMetadata {
+  const reasoning = FALLBACK_REASONING_EFFORTS[id];
   return {
     id,
     name: formatModelName(id),
@@ -252,7 +299,9 @@ function model(id: string, contextLength: number, maxOutputTokens: number, image
     maxOutputTokens,
     imageInput,
     toolCalling: true,
-    reasoningEffort: OFFICIAL_REASONING_EFFORT_MODELS.has(id),
+    ...(reasoning
+      ? { reasoningEfforts: reasoning.efforts, defaultReasoningEffort: reasoning.defaultEffort }
+      : {}),
     cost: aiandModelCost(id),
   };
 }

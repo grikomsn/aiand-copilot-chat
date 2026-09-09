@@ -36,7 +36,13 @@ test("streams a completion and sends the reasoning-off payload", async () => {
     },
   });
   const result = await engine.complete(
-    { prefix: "p", suffix: "s", modelId: "deepseek-ai/deepseek-v4-flash", maxTokens: 128 },
+    {
+      prefix: "p",
+      suffix: "s",
+      modelId: "deepseek-ai/deepseek-v4-flash",
+      maxTokens: 128,
+      reasoningEfforts: ["none", "high", "max"],
+    },
     new AbortController().signal,
   );
   assert.equal(result.text, "out.append");

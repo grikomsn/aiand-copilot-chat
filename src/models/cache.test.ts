@@ -11,7 +11,7 @@ test("restores only complete persisted ai& catalogs", () => {
     maxOutputTokens: 5,
     imageInput: false,
     toolCalling: true,
-    reasoningEffort: false,
+    reasoningEfforts: ["none", "high"],
   };
   assert.deepEqual(parseCatalogSnapshots({ legacy: [model], broken: [{ id: "bad" }] }), { legacy: [model] });
   assert.deepEqual(parseCatalogSnapshots(null), {});
