@@ -1,4 +1,4 @@
-# API key and security
+# Security
 
 ## Credential storage
 
@@ -8,7 +8,7 @@ Use **ai&: Remove API Key** to delete the saved credential. Replacing a key vali
 
 Provider entries created through **Manage Language Models** receive their API key through VS Code's provider configuration and are kept separate from the legacy command-managed key. A short one-way fingerprint is used in memory only to distinguish entries; the key itself is never used as a model identifier or log value.
 
-## Network destination
+## Network destinations
 
 The extension sends requests directly to:
 
@@ -26,5 +26,7 @@ When `aiandCopilot.inlineSuggestions` is enabled, each suggestion sends a bounde
 ## Logging
 
 Debug logging is disabled by default. When enabled, the ai& output channel records model discovery, request metadata, token usage, and errors; it does not intentionally log prompts or API keys.
+
+## Reporting vulnerabilities
 
 Report vulnerabilities according to the [security policy](https://github.com/grikomsn/aiand-copilot-chat/security/policy) or email [security@nibras.co](mailto:security@nibras.co). Do not disclose credentials, sensitive prompts, or vulnerability details in a public issue.
