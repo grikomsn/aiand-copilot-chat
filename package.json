@@ -1,0 +1,225 @@
+{
+  "name": "aiand-copilot-chat",
+  "displayName": "Aiand for GitHub Copilot Chat",
+  "description": "Use hosted ai& (Aiand) models in GitHub Copilot Chat with your Aiand API key.",
+  "version": "0.1.0",
+  "publisher": "grikomsn",
+  "icon": "assets/icon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grikomsn/aiand-copilot-chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/grikomsn/aiand-copilot-chat/issues"
+  },
+  "homepage": "https://github.com/grikomsn/aiand-copilot-chat#readme",
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "aiand",
+    "ai&",
+    "openai-compatible",
+    "copilot",
+    "copilot-chat",
+    "api-key",
+    "language-model"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguageModelChatProvider:aiand"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiandCopilot.setInlineSuggestionsModel",
+        "title": "Aiand: Set Inline Suggestions Model"
+      },
+      {
+        "command": "aiandCopilot.manage",
+        "title": "Aiand: Manage Connection"
+      },
+      {
+        "command": "aiandCopilot.configureApiKey",
+        "title": "Aiand: Configure API Key"
+      },
+      {
+        "command": "aiandCopilot.removeApiKey",
+        "title": "Aiand: Remove API Key"
+      },
+      {
+        "command": "aiandCopilot.refreshModels",
+        "title": "Aiand: Refresh Models"
+      },
+      {
+        "command": "aiandCopilot.showUsage",
+        "title": "Aiand: Show Credits and Usage"
+      },
+      {
+        "command": "aiandCopilot.testConnection",
+        "title": "Aiand: Test Inference"
+      },
+      {
+        "command": "aiandCopilot.openApiKeys",
+        "title": "Aiand: Open API Keys"
+      },
+      {
+        "command": "aiandCopilot.diagnostics",
+        "title": "Aiand: Show Diagnostics"
+      }
+    ],
+    "configuration": {
+      "title": "Aiand for Copilot Chat",
+      "properties": {
+        "aiandCopilot.inlineSuggestions": {
+          "type": "boolean",
+          "default": false,
+          "description": "Experimental. Provide ghost-text inline completions while typing, powered by the Aiand gateway with reasoning_effort none. Credentials, prompts, and document context are never logged."
+        },
+        "aiandCopilot.inlineSuggestionsModel": {
+          "type": "string",
+          "default": "deepseek-ai/deepseek-v4-flash",
+          "description": "Model id used for inline completions. Defaults to the low-latency flash tier."
+        },
+        "aiandCopilot.inlineSuggestionsChatInput": {
+          "type": "boolean",
+          "default": false,
+          "description": "Also offer inline completions inside the Copilot Chat prompt box."
+        },
+        "aiandCopilot.inlineSuggestionsDebounceMs": {
+          "type": "number",
+          "default": 300,
+          "minimum": 50,
+          "maximum": 2000,
+          "description": "Debounce window in milliseconds between typing and an inline completion request."
+        },
+        "aiandCopilot.inlineSuggestionsTimeoutMs": {
+          "type": "number",
+          "default": 3000,
+          "minimum": 500,
+          "maximum": 15000,
+          "description": "Per-request timeout in milliseconds for inline completions."
+        },
+        "aiandCopilot.inlineSuggestionsMaxTokens": {
+          "type": "number",
+          "default": 128,
+          "minimum": 16,
+          "maximum": 1024,
+          "description": "Maximum tokens generated per inline completion."
+        },
+        "aiandCopilot.inlineSuggestionsPrefixLines": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Lines of document context sent before the cursor."
+        },
+        "aiandCopilot.inlineSuggestionsSuffixChars": {
+          "type": "number",
+          "default": 300,
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Characters of document context sent after the cursor."
+        },
+        "aiandCopilot.reasoningEffort": {
+          "type": "string",
+          "enum": [
+            "none",
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "high",
+          "enumDescriptions": [
+            "Disable model reasoning.",
+            "Use less reasoning for lower latency and cost.",
+            "Balance reasoning depth, latency, and cost.",
+            "Use deeper reasoning for complex tasks."
+          ],
+          "description": "Default Aiand reasoning effort. A Copilot model-picker selection overrides this value."
+        },
+        "aiandCopilot.maxOutputTokens": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Maximum output tokens requested from Aiand hosted models. Use 0 to reserve up to 32,768 response tokens. Positive values are capped by the model output capability and context window."
+        },
+        "aiandCopilot.requestTimeoutSeconds": {
+          "type": "number",
+          "default": 600,
+          "minimum": 10,
+          "description": "Maximum duration of a Aiand inference request in seconds."
+        },
+        "aiandCopilot.streamIdleTimeoutSeconds": {
+          "type": "number",
+          "default": 120,
+          "minimum": 10,
+          "description": "Maximum time without receiving streamed Aiand response data before aborting a request."
+        },
+        "aiandCopilot.catalogCacheMinutes": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "description": "How long the Aiand hosted-model catalog is reused before refreshing."
+        },
+        "aiandCopilot.showUsageStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the active Aiand account credit balance and request allowance in the status bar."
+        },
+        "aiandCopilot.debugLogging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Log request, stream, usage, and model-discovery metadata to the Aiand output channel. Prompts and API keys are never logged."
+        }
+      }
+    },
+    "languageModelChatProviders": [
+      {
+        "vendor": "aiand",
+        "displayName": "Aiand",
+        "configuration": {
+          "type": "object",
+          "required": [
+            "apiKey"
+          ],
+          "properties": {
+            "apiKey": {
+              "type": "string",
+              "title": "Aiand API Key",
+              "description": "API key for this Aiand provider entry. VS Code stores configured secrets securely.",
+              "secret": true
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('out',{recursive:true,force:true})\"",
+    "compile": "npm run clean && tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "npm run compile && node --test \"out/**/*.test.js\"",
+    "check": "npm test",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm run check && vsce publish --skip-duplicate",
+    "prepackage": "npm run check",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.0",
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.125.0",
+    "@vscode/vsce": "^3.9.2",
+    "typescript": "^6.0.3"
+  }
+}

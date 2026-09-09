@@ -1,0 +1,123 @@
+export const REASONING_EFFORTS = ["none", "low", "medium", "high"] as const;
+
+export type ReasoningEffort = typeof REASONING_EFFORTS[number];
+export const DEFAULT_REASONING_EFFORT: ReasoningEffort = "high";
+
+export function resolveReasoningEffort(
+  requestConfiguration: Readonly<Record<string, unknown>> | undefined,
+  workspaceDefault: unknown,
+): ReasoningEffort {
+  const requested = stringOption(requestConfiguration, "reasoningEffort")
+    ?? stringOption(requestConfiguration, "thinkingEffort")
+    ?? (typeof workspaceDefault === "string" ? workspaceDefault : undefined);
+  return isReasoningEffort(requested) ? requested : DEFAULT_REASONING_EFFORT;
+}
+
+/** A selectable context window tier shown on a model's picker configuration. */
+export interface ContextSizeOption {
+  /** Context cap in input tokens; "auto" selects the model's default handling. */
+  readonly value: number | "auto";
+  /** Short picker label, e.g. "Auto", "128K", or "Maximum". */
+  readonly label: string;
+  /** Picker description for the tier. */
+  readonly description: string;
+}
+
+/** Fixed context tiers offered below a model's registered input limit. */
+const CONTEXT_SIZE_TIERS: readonly { value: number; label: string }[] = [
+  { value: 65_536, label: "64K" },
+  { value: 131_072, label: "128K" },
+  { value: 200_000, label: "200K" },
+];
+
+/** Builds the context window tiers offered for a model's input limit; undefined when no tier fits. */
+export function contextSizeOptions(maxInputTokens: number): ContextSizeOption[] | undefined {
+  if (!Number.isFinite(maxInputTokens) || maxInputTokens <= CONTEXT_SIZE_TIERS[0].value) return undefined;
+  const tiers = CONTEXT_SIZE_TIERS.filter((tier) => tier.value < maxInputTokens);
+  if (!tiers.length) return undefined;
+  return [
+    // VS Code treats every numeric contextSize, including zero, as an input budget.
+    { value: "auto", label: "Auto", description: "Default context handling for this model." },
+    ...tiers.map((tier) => ({
+      value: tier.value,
+      label: tier.label,
+      description: `Keep the conversation under ${tier.label} input tokens.`,
+    })),
+    {
+      value: maxInputTokens,
+      label: "Maximum",
+      description: "Use the model's full available input limit.",
+    },
+  ];
+}
+
+/** Resolves the effective context cap for a request; Auto and Maximum return undefined. */
+export function resolveContextCap(contextSize: number, maxInputTokens: number): number | undefined {
+  if (!Number.isFinite(contextSize) || contextSize <= 0) return undefined;
+  if (!Number.isFinite(maxInputTokens) || maxInputTokens <= 0) return undefined;
+  const cap = Math.min(Math.floor(contextSize), maxInputTokens);
+  return cap < maxInputTokens ? cap : undefined;
+}
+
+/** Reads the opted-in context size from picker configuration; 0 keeps the model's default handling. */
+export function resolveContextSize(requestConfiguration: Readonly<Record<string, unknown>> | undefined): number {
+  const value = requestConfiguration?.contextSize;
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+}
+
+export function buildModelConfigurationSchema(
+  defaultEffort?: ReasoningEffort,
+  contextOptions?: readonly ContextSizeOption[],
+): {
+  type: "object";
+  properties: Record<string, Record<string, unknown>>;
+} | undefined {
+  if (defaultEffort === undefined && !contextOptions?.length) return undefined;
+  return {
+    type: "object",
+    properties: {
+      ...(defaultEffort !== undefined ? {
+        reasoningEffort: {
+          type: "string",
+          title: "Reasoning Effort",
+          enum: [...REASONING_EFFORTS],
+          enumItemLabels: ["None", "Low", "Medium", "High"],
+          enumDescriptions: [
+            "Disable model reasoning",
+            "Use less reasoning for lower latency and cost",
+            "Balance reasoning depth, latency, and cost",
+            "Use deeper reasoning for complex tasks",
+          ],
+          default: defaultEffort,
+          group: "navigation",
+        },
+      } : {}),
+      ...(contextOptions?.length ? {
+        contextSize: {
+          type: ["string", "number"],
+          title: "Context Window",
+          enum: contextOptions.map((option) => option.value),
+          enumItemLabels: contextOptions.map((option) => option.label),
+          enumDescriptions: contextOptions.map((option) => option.description),
+          default: "auto",
+          group: "tokens",
+        },
+      } : {}),
+    },
+  };
+}
+
+export function applyReasoningEffort(
+  body: Readonly<Record<string, unknown>>,
+  effort: ReasoningEffort,
+): Record<string, unknown> {
+  return { ...body, reasoning_effort: effort };
+}
+
+function isReasoningEffort(value: unknown): value is ReasoningEffort {
+  return typeof value === "string" && REASONING_EFFORTS.includes(value as ReasoningEffort);
+}
+
+function stringOption(value: Readonly<Record<string, unknown>> | undefined, key: string): string | undefined {
+  return typeof value?.[key] === "string" ? value[key] as string : undefined;
+}
