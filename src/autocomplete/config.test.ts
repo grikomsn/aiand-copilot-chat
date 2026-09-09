@@ -33,7 +33,7 @@ test("keeps the configuration section and setting keys stable", () => {
 });
 
 test("uses the documented inline suggestion defaults", () => {
-  // Low-latency flash-tier default; not live-benchmarked against Aiand yet.
+  // Low-latency flash-tier default; not live-benchmarked against ai& yet.
   assert.equal(DEFAULT_INLINE_MODEL, "deepseek-ai/deepseek-v4-flash");
   assert.equal(DEFAULT_INLINE_DEBOUNCE_MS, 300);
   assert.equal(DEFAULT_INLINE_TIMEOUT_MS, 3_000);

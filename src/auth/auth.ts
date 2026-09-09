@@ -26,7 +26,7 @@ export class AiandAuth {
 
   async storeApiKey(value: string): Promise<void> {
     const apiKey = value.trim();
-    if (!apiKey) throw new Error("Aiand API key cannot be empty");
+    if (!apiKey) throw new Error("ai& API key cannot be empty");
     await this.secrets.store(API_KEY_SECRET, apiKey);
   }
 

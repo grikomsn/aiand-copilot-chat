@@ -8,7 +8,7 @@ import { extensionUserAgent } from "./transport/protocol";
 import { renderUsageStatus, updateUsageStatusVisibility } from "./usage/presentation";
 
 export function activate(context: vscode.ExtensionContext): void {
-  const output = vscode.window.createOutputChannel("Aiand");
+  const output = vscode.window.createOutputChannel("ai&");
   const auth = new AiandAuth(context.secrets);
   const provider = new AiandProvider(
     auth,
@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.globalState,
   );
   const usageStatus = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 92);
-  usageStatus.name = "Aiand account balance";
+  usageStatus.name = "ai& account balance";
   usageStatus.command = "aiandCopilot.showUsage";
   renderUsageStatus(usageStatus, provider.getUsageSnapshot());
   updateUsageStatusVisibility(usageStatus);
@@ -48,7 +48,7 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   output.appendLine(
-    `[activate] Aiand for Copilot Chat ${context.extension.packageJSON.version} on VS Code ${vscode.version}`,
+    `[activate] ai& for Copilot Chat ${context.extension.packageJSON.version} on VS Code ${vscode.version}`,
   );
   void auth.hasApiKey().then((configured) => {
     if (!configured) return;

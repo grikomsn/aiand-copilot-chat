@@ -58,7 +58,7 @@ export function registerInlineCompletions(context: vscode.ExtensionContext, deps
     async complete(ctx: CompletionContext, signal: AbortSignal): Promise<CompletionResult> {
       const apiKey = await deps.resolveApiKey();
       if (!apiKey) {
-        log("[completions] no Aiand API key — skipping");
+        log("[completions] no ai& API key — skipping");
         return { text: undefined, durationMs: 0 };
       }
       const keyed = new ChatCompletionEngine({

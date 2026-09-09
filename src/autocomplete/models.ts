@@ -1,7 +1,7 @@
 /**
  * Inline-completion model candidates, ordered cheap-and-fast first.
  *
- * Badges are unmeasured defaults for the Aiand catalog; latency and hidden-
+ * Badges are unmeasured defaults for the ai& catalog; latency and hidden-
  * reasoning behavior have not been benchmarked against api.aiand.com yet.
  * The QuickPick command renders this list and writes the selected id to
  * `aiandCopilot.inlineSuggestionsModel`, so choices need no reload. Unknown
@@ -23,32 +23,32 @@ export const INLINE_MODEL_CANDIDATES: readonly InlineModelCandidate[] = [
   {
     id: "deepseek-ai/deepseek-v4-flash",
     badge: "★ default · fast flash tier",
-    detail: "Lowest-latency Aiand chat model; a sensible default for ghost text.",
+    detail: "Lowest-latency ai& chat model; a sensible default for ghost text.",
   },
   {
     id: "openai/gpt-oss-120b",
     badge: "low cost",
-    detail: "Cheapest per-token Aiand model with reasoning support.",
+    detail: "Cheapest per-token ai& model with reasoning support.",
   },
   {
     id: "google/gemma-4-31b-it",
     badge: "unmeasured",
-    detail: "Mid-size instruct model; latency not yet benchmarked against Aiand.",
+    detail: "Mid-size instruct model; latency not yet benchmarked against ai&.",
   },
   {
     id: "qwen/qwen3.8-27b",
     badge: "unmeasured",
-    detail: "Compact Qwen model; latency not yet benchmarked against Aiand.",
+    detail: "Compact Qwen model; latency not yet benchmarked against ai&.",
   },
   {
     id: "qwen/qwen3.6-27b",
     badge: "unmeasured",
-    detail: "Compact Qwen model; latency not yet benchmarked against Aiand.",
+    detail: "Compact Qwen model; latency not yet benchmarked against ai&.",
   },
   {
     id: "zai-org/glm-5.2",
     badge: "unmeasured",
-    detail: "GLM chat model; latency not yet benchmarked against Aiand.",
+    detail: "GLM chat model; latency not yet benchmarked against ai&.",
   },
   {
     id: "deepseek-ai/deepseek-v4-pro",
@@ -73,7 +73,7 @@ export const INLINE_MODEL_CANDIDATES: readonly InlineModelCandidate[] = [
   {
     id: "motif-technologies/motif-3",
     badge: "unmeasured",
-    detail: "Motif chat model; latency not yet benchmarked against Aiand.",
+    detail: "Motif chat model; latency not yet benchmarked against ai&.",
   },
 ];
 

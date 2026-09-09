@@ -32,6 +32,6 @@ The packaged extension contains compiled runtime files, Marketplace metadata, th
 
 ## References
 
-- [Aiand API documentation](https://docs.aiand.com)
-- [Aiand model pricing and capabilities](https://docs.aiand.com)
-- [Aiand API console](https://console.aiand.com)
+- [ai& API documentation](https://docs.aiand.com)
+- [ai& model pricing and capabilities](https://docs.aiand.com)
+- [ai& API console](https://console.aiand.com)

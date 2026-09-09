@@ -32,7 +32,7 @@ export function aiandModelCost(id: string, discovered?: ModelCost): ModelCost | 
 
 /**
  * Converts the per-million pricing from `GET /v1/models` into costs.
- * Aiand reports rates already per 1M tokens as decimal strings
+ * ai& reports rates already per 1M tokens as decimal strings
  * (e.g. `"input_per_1m": "0.15"` or `{ "prompt": "0.35" }`), so the
  * values pass through unchanged; no per-token scaling is applied.
  */

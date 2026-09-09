@@ -13,7 +13,7 @@ import {
   resolveMaxOutputTokens,
 } from "./catalog";
 
-test("accepts Aiand chat model IDs and excludes non-chat families", () => {
+test("accepts ai& chat model IDs and excludes non-chat families", () => {
   assert.equal(isAiandChatModel("deepseek-ai/deepseek-v4-pro"), true);
   assert.equal(isAiandChatModel("moonshotai/kimi-k2.7-code"), true);
   assert.equal(isAiandChatModel("multilingual-e5-large-instruct"), true);
@@ -71,7 +71,7 @@ test("uses exactly the discovered catalog and advertised metadata", () => {
     orderModelMetadata([
       {
         id: "custom-vision",
-        name: "Aiand: Custom Vision",
+        name: "ai&: Custom Vision",
         context_length: 500_000,
         max_completion_tokens: 64_000,
         input_modalities: ["text", "image"],
@@ -112,7 +112,7 @@ test("uses live capability flags and official reasoning fallbacks", () => {
   assert.equal(getModelMetadata("some-unknown-model").reasoningEffort, false);
 });
 
-test("reads Aiand capabilities arrays and per-million pricing", () => {
+test("reads ai& capabilities arrays and per-million pricing", () => {
   const [live] = orderModelMetadata([
     {
       id: "google/gemma-4-31b-it",
@@ -128,7 +128,7 @@ test("reads Aiand capabilities arrays and per-million pricing", () => {
   assert.deepEqual(live.cost, { input: 0.2, output: 0.5 });
 });
 
-test("fills descriptive and capability metadata from the Aiand models.dev snapshot", () => {
+test("fills descriptive and capability metadata from the ai& models.dev snapshot", () => {
   const enriched = enrichModelMetadata(getModelMetadata("deepseek-ai/deepseek-v4-pro"), {
     id: "deepseek-ai/deepseek-v4-pro",
     description: "General coding model",
@@ -141,7 +141,7 @@ test("fills descriptive and capability metadata from the Aiand models.dev snapsh
   assert.equal(enriched.releaseDate, "2025-12-01");
 });
 
-test("prefers live model pricing and falls back to Aiand's official table", () => {
+test("prefers live model pricing and falls back to ai&'s official table", () => {
   const [live] = orderModelMetadata([
     {
       id: "google/gemma-4-31b-it",
@@ -161,7 +161,7 @@ test("prefers live model pricing and falls back to Aiand's official table", () =
   });
 });
 
-test("uses the official display name when Aiand reuses a colliding raw name", () => {
+test("uses the official display name when ai& reuses a colliding raw name", () => {
   const [live] = orderModelMetadata([
     {
       id: "openai/gpt-oss-120b",

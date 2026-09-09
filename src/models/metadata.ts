@@ -24,14 +24,14 @@ export interface MetadataCache {
 
 export function normalizeModelsDevSnapshot(payload: unknown, fetchedAt: number): ModelsDevSnapshot {
   const models = record(record(record(payload)?.aiand)?.models);
-  if (!models) throw new Error("Models.dev returned no Aiand model catalog");
+  if (!models) throw new Error("Models.dev returned no ai& model catalog");
   const normalized = Object.fromEntries(
     Object.entries(models).flatMap(([key, value]) => {
       const model = normalizeModel(key, value);
       return model ? [[model.id, model]] : [];
     }),
   );
-  if (!Object.keys(normalized).length) throw new Error("Models.dev returned no usable Aiand models");
+  if (!Object.keys(normalized).length) throw new Error("Models.dev returned no usable ai& models");
   return { fetchedAt, models: normalized };
 }
 

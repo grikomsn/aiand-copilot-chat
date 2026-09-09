@@ -61,7 +61,7 @@ export function mergeAccountUsage(current: AiandUsageSnapshot, raw: unknown, upd
     : {
         ...current,
         updatedAt,
-        error: "Aiand returned invalid account usage data",
+        error: "ai& returned invalid account usage data",
       };
 }
 
@@ -107,15 +107,15 @@ export function toProviderUsagePayload(raw: Record<string, unknown>): ProviderUs
 }
 
 export function formatUsageStatusBar(snapshot: AiandUsageSnapshot): string {
-  if (snapshot.account?.credits !== undefined) return `$(credit-card) Aiand $${formatMoney(snapshot.account.credits)}`;
+  if (snapshot.account?.credits !== undefined) return `$(credit-card) ai& $${formatMoney(snapshot.account.credits)}`;
   if (snapshot.account?.usableRequests !== undefined && snapshot.account.usableRequests !== null)
-    return `$(pulse) Aiand ${compactCount(snapshot.account.usableRequests)} req`;
-  if (snapshot.error) return "$(warning) Aiand usage";
-  return "$(cloud) Aiand";
+    return `$(pulse) ai& ${compactCount(snapshot.account.usableRequests)} req`;
+  if (snapshot.error) return "$(warning) ai& usage";
+  return "$(cloud) ai&";
 }
 
 export function formatUsageTooltip(snapshot: AiandUsageSnapshot): string {
-  const lines = ["Aiand account balance and API activity"];
+  const lines = ["ai& account balance and API activity"];
   if (snapshot.account?.credits !== undefined) lines.push(`Credit balance: $${formatMoney(snapshot.account.credits)}`);
   if (snapshot.account?.usableRequests === null) lines.push("Daily request allowance: pay-as-you-go account");
   else if (snapshot.account?.usableRequests !== undefined)
@@ -137,7 +137,7 @@ export function formatUsageRows(snapshot: AiandUsageSnapshot): UsageDisplayRow[]
       kind: "credits",
       label: "Credit balance",
       description: `$${formatMoney(snapshot.account.credits)}`,
-      detail: "Available pay-as-you-go Aiand credits",
+      detail: "Available pay-as-you-go ai& credits",
     });
   if (snapshot.account?.usableRequests !== undefined)
     rows.push({

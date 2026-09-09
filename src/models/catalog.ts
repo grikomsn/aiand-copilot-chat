@@ -176,7 +176,7 @@ export function formatModelName(id: string): string {
   const canonical = canonicalModelId(id);
   const official = OFFICIAL_MODEL_NAMES[canonical];
   if (official) return official;
-  // Aiand ids are namespaced as `provider/model` (e.g. `qwen/qwen3.8-27b`).
+  // ai& ids are namespaced as `provider/model` (e.g. `qwen/qwen3.8-27b`).
   const namespaced = canonical.split("/");
   const vendor = VENDOR_LABELS[namespaced[0] ?? ""];
   const modelPart = namespaced.length > 1 ? namespaced.slice(1).join("-") : canonical;
@@ -214,7 +214,7 @@ function modelMetadataFromApi(raw: AiandApiModel): AiandModelMetadata | undefine
   const capabilities = stringArray(raw.capabilities);
   const modalities = stringArray(raw.input_modalities) ?? stringArray(architecture?.input_modalities);
   const rawName = typeof raw.name === "string" ? raw.name : "";
-  const apiName = rawName.trim().replace(/^Aiand:\s*/i, "").trim();
+  const apiName = rawName.trim().replace(/^ai&:\s*/i, "").trim();
   const capabilitySet = new Set((capabilities ?? []).map((value) => value.toLowerCase()));
   return {
     id,
@@ -270,7 +270,7 @@ function liveContextLength(raw: AiandApiModel): number | undefined {
   return positiveInteger(raw.context_window ?? raw.context_length ?? raw.max_context_tokens ?? raw.max_model_len);
 }
 
-/** Aiand also reports flat `input_per_1m` / `output_per_1m` decimal strings; map them to pricing shape. */
+/** ai& also reports flat `input_per_1m` / `output_per_1m` decimal strings; map them to pricing shape. */
 function pickPerMillionPricing(raw: AiandApiModel): Record<string, unknown> | undefined {
   if (raw.input_per_1m === undefined && raw.output_per_1m === undefined) return undefined;
   return { prompt: raw.input_per_1m, completion: raw.output_per_1m };

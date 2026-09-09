@@ -68,14 +68,14 @@ export class ChatCompletionEngine {
       });
     } catch (error) {
       if (signal.aborted) return { text: undefined, durationMs: Date.now() - started };
-      throw new Error(`Aiand completion request failed: ${messageOf(error)}`);
+      throw new Error(`ai& completion request failed: ${messageOf(error)}`);
     }
     if (!response.ok) {
       // Upstream error bodies can echo prompt context; never surface them.
       await response.body?.cancel().catch(() => undefined);
-      throw new Error(`Aiand completion request failed (${response.status})`);
+      throw new Error(`ai& completion request failed (${response.status})`);
     }
-    if (!response.body) throw new Error("Aiand returned an empty completion stream");
+    if (!response.body) throw new Error("ai& returned an empty completion stream");
     const clean = stripSpecialTokens(await readContentStream(response.body, requestSignal));
     return { text: clean.trim() ? clean : undefined, durationMs: Date.now() - started };
   }

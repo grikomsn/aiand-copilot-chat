@@ -1,10 +1,10 @@
 /**
- * Prompt construction for the Aiand chat-completions completion engine.
+ * Prompt construction for the ai& chat-completions completion engine.
  *
- * Aiand exposes no FIM endpoint, so fill-in-the-middle is emulated with FIM
+ * ai& exposes no FIM endpoint, so fill-in-the-middle is emulated with FIM
  * delimiter tokens inline over the fixed `/chat/completions` endpoint, and
  * reasoning is disabled with the accepted `reasoning_effort: "none"` value.
- * Inline latency has not been benchmarked against Aiand yet; the default
+ * Inline latency has not been benchmarked against ai& yet; the default
  * flash-tier model is chosen for its low cost and latency class, not from
  * live measurements.
  *

@@ -28,7 +28,7 @@ const payload = {
   },
 };
 
-test("normalizes the Aiand models.dev provider", () => {
+test("normalizes the ai& models.dev provider", () => {
   assert.deepEqual(normalizeModelsDevSnapshot(payload, 1).models.m, {
     id: "m",
     description: "Model",

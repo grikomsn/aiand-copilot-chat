@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ChatCompletionStreamParser, validateStreamCompletion } from "./sse";
 
-test("parses fragmented Aiand text, reasoning, usage, and tool calls", () => {
+test("parses fragmented ai& text, reasoning, usage, and tool calls", () => {
   const parser = new ChatCompletionStreamParser();
   const events = [
     ...parser.push('data: {"choices":[{"delta":{"reasoning_content":"think"}}]}\n'),
@@ -30,7 +30,7 @@ test("ignores comments and malformed event blocks", () => {
   assert.deepEqual(parser.finish(), []);
 });
 
-test("ignores the Aiand metrics trailer after the done marker", () => {
+test("ignores the ai& metrics trailer after the done marker", () => {
   const parser = new ChatCompletionStreamParser();
   const events = [
     ...parser.push('data: {"choices":[{"delta":{"content":"hi"}}],"usage":{"prompt_tokens":7}}\n\n'),

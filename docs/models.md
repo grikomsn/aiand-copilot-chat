@@ -2,7 +2,7 @@
 
 ## Live metadata
 
-The extension discovers the catalog available to the configured Aiand account
+The extension discovers the catalog available to the configured ai& account
 from `https://api.aiand.com/v1/models`. Live responses provide the context window,
 maximum output length, reasoning-effort support, and per-model pricing used by
 Copilot Chat. A bundled snapshot keeps model selection useful during transient
@@ -37,9 +37,9 @@ ID used for billing.
 ## Pricing
 
 The model picker displays each model's live input, cached-input, and output
-pricing from the Aiand `/v1/models` response when available. When live pricing
+pricing from the ai& `/v1/models` response when available. When live pricing
 is missing, the extension falls back to the official rates captured alongside
-the fallback snapshot. See [Aiand pricing](https://docs.aiand.com).
+the fallback snapshot. See [ai& pricing](https://docs.aiand.com).
 
 ## Context window size
 

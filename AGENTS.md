@@ -13,7 +13,7 @@
 - `src/auth/auth.ts`: API-key Secret Storage and credential references.
 - `src/provider.ts`: VS Code provider integration, model-entry credentials, request conversion, and response reporting.
 - `src/models/catalog.ts`: hosted-model filtering, fallbacks, and display metadata.
-- `src/models/options.ts`: reasoning-effort schema, precedence, and Aiand request payload translation.
+- `src/models/options.ts`: reasoning-effort schema, precedence, and ai& request payload translation.
 - `src/transport/protocol.ts`: fixed endpoints, request identity, and headers.
 - `src/transport/sse.ts`: incremental SSE parsing into text, reasoning, tool-call, and usage events.
 - `src/usage/domain.ts`: provider usage normalization for VS Code.
@@ -32,8 +32,8 @@
 - Add or update colocated `node:test` coverage for behavior changes. Network paths must use injected fakes rather than live services.
 - Preserve native VS Code provider-entry configuration: each API-key entry must use only its configured key, and the legacy Secret Storage key remains an explicit command-managed fallback.
 - Keep API keys in VS Code Secret Storage or VS Code-managed provider configuration. Never log or commit keys, private prompts, captured responses, or account data.
-- Requests must use the fixed Aiand endpoint and user agent from `src/transport/protocol.ts`; never redirect credentials through a workspace-configurable endpoint.
-- Treat Aiand and OpenAI-compatible response behavior as an undocumented integration surface. Parse defensively and keep protocol-specific behavior covered by tests.
+- Requests must use the fixed ai& endpoint and user agent from `src/transport/protocol.ts`; never redirect credentials through a workspace-configurable endpoint.
+- Treat ai& and OpenAI-compatible response behavior as an undocumented integration surface. Parse defensively and keep protocol-specific behavior covered by tests.
 - When commands, settings, models, security behavior, or user workflows change, keep `package.json`, tests, documentation, and Changesets synchronized.
 - Do not commit generated `out/`, source maps, VSIX files, logs, or unrelated formatting/dependency churn.
 

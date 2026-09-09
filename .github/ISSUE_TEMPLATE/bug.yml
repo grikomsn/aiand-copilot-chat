@@ -45,7 +45,7 @@ body:
   - type: input
     id: model
     attributes:
-      label: Aiand model
+      label: ai& model
       description: Leave blank if the problem occurs before model selection.
 
   - type: textarea

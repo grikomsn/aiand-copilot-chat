@@ -68,7 +68,7 @@ test("never echoes upstream error bodies", async () => {
   });
   await assert.rejects(
     engine.complete({ prefix: "p", suffix: "s", modelId: "deepseek-ai/deepseek-v4-flash", maxTokens: 8 }, new AbortController().signal),
-    (error: unknown) => error instanceof Error && error.message === "Aiand completion request failed (401)",
+    (error: unknown) => error instanceof Error && error.message === "ai& completion request failed (401)",
   );
 });
 

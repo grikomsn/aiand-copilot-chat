@@ -62,7 +62,7 @@ function convertMessage(message: vscode.LanguageModelChatRequestMessage, imageIn
         content: part.content.map(inputPartText).join("\n"),
       });
     else if (part instanceof vscode.LanguageModelDataPart && part.mimeType.startsWith("image/")) {
-      if (!imageInput) throw new Error("The selected Aiand model does not advertise image input support.");
+      if (!imageInput) throw new Error("The selected ai& model does not advertise image input support.");
       images.push({
         type: "image_url",
         image_url: {

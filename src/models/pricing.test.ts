@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { costCategory, aiandModelCost, modelCostFromApi, modelPricingFields } from "./pricing";
 
-test("passes through Aiand per-million API rates without per-token scaling", () => {
+test("passes through ai& per-million API rates without per-token scaling", () => {
   assert.deepEqual(modelCostFromApi({
     prompt: "0.35",
     cache_prompt: "0.01",

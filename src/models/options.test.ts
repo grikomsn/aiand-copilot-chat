@@ -11,7 +11,7 @@ import {
   resolveReasoningEffort,
 } from "./options";
 
-test("exposes Aiand reasoning efforts in the model picker", () => {
+test("exposes ai& reasoning efforts in the model picker", () => {
   const schema = buildModelConfigurationSchema("medium");
   assert.deepEqual(schema?.properties.reasoningEffort.enum, REASONING_EFFORTS);
   assert.deepEqual(schema?.properties.reasoningEffort.enumItemLabels, ["None", "Low", "Medium", "High"]);
@@ -30,7 +30,7 @@ test("unsupported effort safely falls back to high", () => {
   assert.equal(resolveReasoningEffort(undefined, "invalid"), DEFAULT_REASONING_EFFORT);
 });
 
-test("sends Aiand's documented reasoning_effort parameter", () => {
+test("sends ai&'s documented reasoning_effort parameter", () => {
   assert.deepEqual(applyReasoningEffort({ model: "glm-5.2" }, "none"), {
     model: "glm-5.2",
     reasoning_effort: "none",

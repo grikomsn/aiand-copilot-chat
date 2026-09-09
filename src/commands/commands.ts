@@ -1,4 +1,4 @@
-/** User-facing Aiand commands and connection workflows. */
+/** User-facing ai& commands and connection workflows. */
 
 import * as vscode from "vscode";
 import { CONFIG_SECTION, DEFAULT_INLINE_MODEL, INLINE_SUGGESTIONS_MODEL_SETTING } from "../autocomplete/config";
@@ -32,23 +32,23 @@ async function manage(auth: AiandAuth, provider: AiandProvider, output: vscode.O
   const configured = await auth.hasApiKey();
   const choices = configured
     ? [
-        { label: "$(check) Test Aiand inference", action: "test" },
+        { label: "$(check) Test ai& inference", action: "test" },
         { label: "$(refresh) Refresh hosted models", action: "refresh" },
         { label: "$(zap) Set inline suggestions model", action: "inlineModel" },
         { label: "$(history) Show usage", action: "usage" },
         { label: "$(key) Replace API key", action: "configure" },
-        { label: "$(link-external) Open Aiand API keys", action: "open" },
-        { label: "$(output) Show Aiand logs", action: "logs" },
+        { label: "$(link-external) Open ai& API keys", action: "open" },
+        { label: "$(output) Show ai& logs", action: "logs" },
         { label: "$(info) Show diagnostics", action: "diagnostics" },
         { label: "$(trash) Remove API key", action: "remove" },
       ]
     : [
-        { label: "$(key) Configure Aiand API key", action: "configure" },
-        { label: "$(link-external) Open Aiand API keys", action: "open" },
-        { label: "$(output) Show Aiand logs", action: "logs" },
+        { label: "$(key) Configure ai& API key", action: "configure" },
+        { label: "$(link-external) Open ai& API keys", action: "open" },
+        { label: "$(output) Show ai& logs", action: "logs" },
       ];
   const picked = await vscode.window.showQuickPick(choices, {
-    title: `Aiand — API key ${configured ? "configured" : "not configured"}`,
+    title: `ai& — API key ${configured ? "configured" : "not configured"}`,
   });
   if (!picked) return;
   if (picked.action === "configure") await configureApiKey(provider, output);
@@ -64,12 +64,12 @@ async function manage(auth: AiandAuth, provider: AiandProvider, output: vscode.O
 
 async function configureApiKey(provider: AiandProvider, output: vscode.OutputChannel): Promise<boolean> {
   const apiKey = await vscode.window.showInputBox({
-    title: "Configure Aiand API key",
-    prompt: "The key is validated with Aiand, then stored in VS Code Secret Storage.",
-    placeHolder: "Paste your Aiand API key",
+    title: "Configure ai& API key",
+    prompt: "The key is validated with ai&, then stored in VS Code Secret Storage.",
+    placeHolder: "Paste your ai& API key",
     password: true,
     ignoreFocusOut: true,
-    validateInput: (value) => (value.trim() ? undefined : "Enter a Aiand API key"),
+    validateInput: (value) => (value.trim() ? undefined : "Enter an ai& API key"),
   });
   if (!apiKey) return false;
 
@@ -77,36 +77,36 @@ async function configureApiKey(provider: AiandProvider, output: vscode.OutputCha
     const models = await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: "Validating Aiand API key…",
+        title: "Validating ai& API key…",
       },
       () => provider.configureApiKey(apiKey),
     );
     output.appendLine(`[auth] API key configured; models=${models.join(",")}`);
-    vscode.window.showInformationMessage(`Aiand connected. Found ${models.length} hosted models.`);
+    vscode.window.showInformationMessage(`ai& connected. Found ${models.length} hosted models.`);
     return true;
   } catch (error) {
     const message = messageOf(error);
     output.appendLine(`[auth] API key validation failed: ${message}`);
-    vscode.window.showErrorMessage(`Aiand API key was not saved: ${message}`);
+    vscode.window.showErrorMessage(`ai& API key was not saved: ${message}`);
     return false;
   }
 }
 
 async function removeApiKey(provider: AiandProvider): Promise<void> {
   const choice = await vscode.window.showWarningMessage(
-    "Remove the Aiand API key from VS Code Secret Storage?",
+    "Remove the ai& API key from VS Code Secret Storage?",
     { modal: true },
     "Remove API Key",
   );
   if (choice !== "Remove API Key") return;
   await provider.clearApiKey();
-  vscode.window.showInformationMessage("Aiand API key removed.");
+  vscode.window.showInformationMessage("ai& API key removed.");
 }
 
 async function refreshModels(provider: AiandProvider): Promise<void> {
   try {
     const models = await provider.refreshModels();
-    vscode.window.showInformationMessage(`Refreshed ${models.length} Aiand hosted models.`);
+    vscode.window.showInformationMessage(`Refreshed ${models.length} ai& hosted models.`);
   } catch (error) {
     vscode.window.showErrorMessage(messageOf(error));
   }
@@ -127,9 +127,9 @@ async function setInlineSuggestionsModel(): Promise<void> {
       action: choice.id,
     })),
     { label: "", kind: vscode.QuickPickItemKind.Separator },
-    { label: "$(pencil) Use a custom model id…", detail: "Enter any Aiand model id that completes cleanly at reasoning_effort none.", action: "custom" as const },
+    { label: "$(pencil) Use a custom model id…", detail: "Enter any ai& model id that completes cleanly at reasoning_effort none.", action: "custom" as const },
   ], {
-    title: "Aiand — Set Inline Suggestions Model",
+    title: "ai& — Set Inline Suggestions Model",
     placeHolder: `Current: ${current}`,
   });
   if (!picked?.action) return;
@@ -137,15 +137,15 @@ async function setInlineSuggestionsModel(): Promise<void> {
     const value = await vscode.window.showInputBox({
       title: "Custom inline suggestions model id",
       value: current,
-      prompt: "Any Aiand model id; the vetted list is a starting point, not a restriction.",
+      prompt: "Any ai& model id; the vetted list is a starting point, not a restriction.",
     });
     if (value === undefined || !value.trim()) return;
     await configuration.update(INLINE_SUGGESTIONS_MODEL_SETTING, value.trim(), vscode.ConfigurationTarget.Global);
-    void vscode.window.showInformationMessage(`Aiand inline suggestions model set to ${value.trim()}.`);
+    void vscode.window.showInformationMessage(`ai& inline suggestions model set to ${value.trim()}.`);
     return;
   }
   await configuration.update(INLINE_SUGGESTIONS_MODEL_SETTING, picked.action, vscode.ConfigurationTarget.Global);
-  void vscode.window.showInformationMessage(`Aiand inline suggestions model set to ${picked.action}. Applies on the next keystroke.`);
+  void vscode.window.showInformationMessage(`ai& inline suggestions model set to ${picked.action}. Applies on the next keystroke.`);
 }
 
 async function testConnection(provider: AiandProvider, output: vscode.OutputChannel): Promise<void> {
@@ -153,7 +153,7 @@ async function testConnection(provider: AiandProvider, output: vscode.OutputChan
     const result = await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: "Testing Aiand inference…",
+        title: "Testing ai& inference…",
       },
       () => provider.testConnection(),
     );
@@ -161,18 +161,18 @@ async function testConnection(provider: AiandProvider, output: vscode.OutputChan
       `[test] model=${result.model} effort=${result.reasoningEffort ?? "model-default"} response=${result.text}`,
     );
     vscode.window.showInformationMessage(
-      `Aiand verified with ${result.model}${result.reasoningEffort ? ` (${result.reasoningEffort} effort)` : ""}: ${result.text}`,
+      `ai& verified with ${result.model}${result.reasoningEffort ? ` (${result.reasoningEffort} effort)` : ""}: ${result.text}`,
     );
   } catch (error) {
     const message = messageOf(error);
     output.appendLine(`[test] ${message}`);
-    vscode.window.showErrorMessage(`Aiand connection test failed: ${message}`);
+    vscode.window.showErrorMessage(`ai& connection test failed: ${message}`);
   }
 }
 
 async function openApiKeys(): Promise<void> {
   const opened = await vscode.env.openExternal(vscode.Uri.parse(API_KEYS_URL));
-  if (!opened) vscode.window.showWarningMessage("VS Code could not open the Aiand dashboard.");
+  if (!opened) vscode.window.showWarningMessage("VS Code could not open the ai& dashboard.");
 }
 
 interface UsageQuickPickItem extends vscode.QuickPickItem {
@@ -184,7 +184,7 @@ async function showUsage(provider: AiandProvider, output: vscode.OutputChannel):
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Window,
-        title: "Loading Aiand usage…",
+        title: "Loading ai& usage…",
       },
       () => provider.refreshUsage(),
     );
@@ -200,7 +200,7 @@ async function showUsage(provider: AiandProvider, output: vscode.OutputChannel):
       { label: "$(key) Configure or replace API key", action: "configure" },
     ] satisfies UsageQuickPickItem[],
     {
-      title: "Aiand usage",
+      title: "ai& usage",
       placeHolder: "Locally tracked inference tokens",
       matchOnDescription: true,
       matchOnDetail: true,
@@ -229,7 +229,7 @@ function toUsageQuickPickItem(row: UsageDisplayRow): UsageQuickPickItem {
 async function diagnostics(auth: AiandAuth, output: vscode.OutputChannel): Promise<void> {
   const models = await vscode.lm.selectChatModels({ vendor: "aiand" });
   const lines = [
-    "# Aiand for Copilot Chat diagnostics",
+    "# ai& for Copilot Chat diagnostics",
     "",
     `- VS Code: ${vscode.version}`,
     `- API endpoint: ${API_BASE}`,

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { parseCatalogSnapshots } from "./cache";
 
-test("restores only complete persisted Aiand catalogs", () => {
+test("restores only complete persisted ai& catalogs", () => {
   const model = {
     id: "m",
     name: "M",

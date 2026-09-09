@@ -45,7 +45,7 @@ export class ChatCompletionStreamParser {
 
   private parseBlock(block: string): ChatStreamEvent | undefined {
     const lines = block.split("\n");
-    // Aiand may emit a named `event: metrics` trailer after `data: [DONE]`
+    // ai& may emit a named `event: metrics` trailer after `data: [DONE]`
     // (cost/TTFT payload when the request opts into metrics). It carries no
     // chat content, so ignore non-default SSE event blocks entirely.
     const eventName = lines
@@ -119,10 +119,10 @@ export class ChatCompletionStreamParser {
 
 export function validateStreamCompletion(finishReason: string | undefined): void {
   if (finishReason === "stop" || finishReason === "tool_calls" || finishReason === "function_call") return;
-  if (!finishReason) throw new Error("Aiand response stream ended before a completion reason was received");
-  if (finishReason === "length") throw new Error("Aiand response reached its output token limit before completing");
-  if (finishReason === "content_filter") throw new Error("Aiand stopped the response because of its content filter");
-  throw new Error(`Aiand response ended with finish reason: ${finishReason}`);
+  if (!finishReason) throw new Error("ai& response stream ended before a completion reason was received");
+  if (finishReason === "length") throw new Error("ai& response reached its output token limit before completing");
+  if (finishReason === "content_filter") throw new Error("ai& stopped the response because of its content filter");
+  throw new Error(`ai& response ended with finish reason: ${finishReason}`);
 }
 
 function completeToolCall(tool: PendingToolCall): PendingToolCall {
@@ -130,7 +130,7 @@ function completeToolCall(tool: PendingToolCall): PendingToolCall {
   try {
     JSON.parse(args);
   } catch {
-    throw new Error(`Aiand response stream ended with incomplete arguments for tool ${tool.name}`);
+    throw new Error(`ai& response stream ended with incomplete arguments for tool ${tool.name}`);
   }
   return { ...tool, arguments: args };
 }

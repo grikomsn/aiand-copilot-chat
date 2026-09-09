@@ -8,7 +8,7 @@ import {
   toProviderUsagePayload,
 } from "./domain";
 
-test("normalizes Aiand OpenAI-compatible usage for VS Code", () => {
+test("normalizes ai& OpenAI-compatible usage for VS Code", () => {
   assert.deepEqual(
     toProviderUsagePayload({
       prompt_tokens: 140,
@@ -49,7 +49,7 @@ test("tracks local request activity alongside the account balance", () => {
   assert.equal(snapshot.tracked?.requests, 1);
   assert.equal(snapshot.tracked?.totalTokens, 10);
   assert.equal(snapshot.tracked?.cost, 0.001);
-  assert.equal(formatUsageStatusBar(snapshot), "$(credit-card) Aiand $3");
+  assert.equal(formatUsageStatusBar(snapshot), "$(credit-card) ai& $3");
   assert.equal(formatUsageRows(snapshot)[0]?.label, "Credit balance");
 });
 

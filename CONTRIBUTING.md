@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Aiand for GitHub Copilot Chat.
+Thanks for helping improve ai& for GitHub Copilot Chat.
 
 ## Before opening work
 

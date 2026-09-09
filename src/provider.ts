@@ -153,10 +153,10 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
         detail:
           credentialRef === "legacy"
             ? apiKey
-              ? "Aiand"
-              : "Aiand API key required"
-            : `Aiand · ${credentialRef.slice(0, 8)}`,
-        tooltip: `${metadata.id} via Aiand · ${formatTokenLimit(metadata.contextLength)} context · ${formatTokenLimit(
+              ? "ai&"
+              : "ai& API key required"
+            : `ai& · ${credentialRef.slice(0, 8)}`,
+        tooltip: `${metadata.id} via ai& · ${formatTokenLimit(metadata.contextLength)} context · ${formatTokenLimit(
           metadata.maxOutputTokens,
         )} max output${metadata.imageInput ? " · image input" : " · text input"}${
           metadata.releaseDate ? ` · released ${metadata.releaseDate}` : ""
@@ -165,7 +165,7 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
         isUserSelectable: true,
         ...(credentialRef !== "legacy" ? { isBYOK: true } : {}),
         ...(credentialRef === "legacy" && !apiKey
-          ? { requiresAuthorization: { label: "Configure Aiand API key" } }
+          ? { requiresAuthorization: { label: "Configure ai& API key" } }
           : {}),
         ...(metadata.reasoningEffort || contextSizeOptions(limits.maxInputTokens)
           ? {
@@ -239,8 +239,8 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
         body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
-      if (!response.ok) throw await apiError(`Aiand request failed for ${model.rawModelId}`, response);
-      if (!response.body) throw new Error("Aiand returned an empty response stream");
+      if (!response.ok) throw await apiError(`ai& request failed for ${model.rawModelId}`, response);
+      if (!response.body) throw new Error("ai& returned an empty response stream");
 
       const parser = new ChatCompletionStreamParser();
       const reader = response.body.getReader();
@@ -263,9 +263,9 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
     } catch (error) {
       if (token.isCancellationRequested) return;
       if (timedOut === "idle")
-        throw new Error(`Aiand request for ${model.rawModelId} received no data for ${idleTimeoutSeconds} seconds`);
+        throw new Error(`ai& request for ${model.rawModelId} received no data for ${idleTimeoutSeconds} seconds`);
       if (timedOut === "total")
-        throw new Error(`Aiand request for ${model.rawModelId} exceeded ${timeoutSeconds} seconds`);
+        throw new Error(`ai& request for ${model.rawModelId} exceeded ${timeoutSeconds} seconds`);
       throw error;
     } finally {
       clearTimeout(totalTimeout);
@@ -301,7 +301,7 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
       messages: [
         {
           role: "user",
-          content: "Reply with exactly: Aiand connection verified",
+          content: "Reply with exactly: ai& connection verified",
         },
       ],
       max_completion_tokens: 512,
@@ -314,7 +314,7 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
         models[0]?.reasoningEffort ? applyReasoningEffort(requestBody, reasoningEffort) : requestBody,
       ),
     });
-    if (!response.ok) throw await apiError("Aiand connection test failed", response);
+    if (!response.ok) throw await apiError("ai& connection test failed", response);
     const responseBody = (await response.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
     };
@@ -336,7 +336,7 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
   }
 
   async refreshUsage(credentialRef = this.activeCredentialRef): Promise<AiandUsageSnapshot> {
-    // Aiand exposes no account-balance endpoint; per-request token usage
+    // ai& exposes no account-balance endpoint; per-request token usage
     // arrives in stream `usage` blocks and is tracked locally via
     // recordRequestUsage. Refreshing therefore just stamps the cached
     // snapshot so the UI can re-render.
@@ -347,17 +347,17 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
   }
 
   private async fetchModels(apiKey: string): Promise<AiandModelMetadata[]> {
-    if (!apiKey) throw new Error("Aiand API key is not configured");
+    if (!apiKey) throw new Error("ai& API key is not configured");
     const response = await fetch(AIAND_ENDPOINTS.models, {
       headers: this.requestHeaders(apiKey, "application/json, application/problem+json"),
     });
-    if (!response.ok) throw await apiError("Unable to list Aiand models", response);
+    if (!response.ok) throw await apiError("Unable to list ai& models", response);
     const body = (await response.json()) as { data?: AiandApiModel[] };
     const enrichment = await this.metadata.getOrRefresh();
     const models = orderModelMetadata(body.data ?? []).map((model) =>
       enrichModelMetadata(model, enrichment.models[model.id]),
     );
-    if (!models.length) throw new Error("Aiand returned no chat-capable models");
+    if (!models.length) throw new Error("ai& returned no chat-capable models");
     if (this.debugLogging) this.output.appendLine(`[models] ${models.map(({ id }) => id).join(", ")}`);
     return models;
   }
@@ -371,8 +371,8 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
     if (!apiKey) {
       throw new Error(
         credentialRef === "legacy"
-          ? "Aiand API key is not configured. Run ‘Aiand: Configure API Key’."
-          : "The API key for this Aiand provider entry is unavailable. Update the entry in Manage Language Models.",
+          ? "ai& API key is not configured. Run ‘ai&: Configure API Key’."
+          : "The API key for this ai& provider entry is unavailable. Update the entry in Manage Language Models.",
       );
     }
     return apiKey;
@@ -449,7 +449,7 @@ class MemoryMetadataCache {
 }
 
 function modelFamily(modelId: string): string {
-  return modelId.toLowerCase().split(/[-/]/, 1)[0] || "aiandai";
+  return modelId.toLowerCase().split(/[-/]/, 1)[0] || "aiand";
 }
 
 async function waitForRetry(milliseconds: number, signal: AbortSignal | null | undefined): Promise<void> {

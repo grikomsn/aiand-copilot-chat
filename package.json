@@ -1,7 +1,7 @@
 {
   "name": "aiand-copilot-chat",
-  "displayName": "Aiand for GitHub Copilot Chat",
-  "description": "Use hosted ai& (Aiand) models in GitHub Copilot Chat with your Aiand API key.",
+  "displayName": "ai& for GitHub Copilot Chat",
+  "description": "Use hosted ai& models in GitHub Copilot Chat with your ai& API key.",
   "version": "0.1.0",
   "publisher": "grikomsn",
   "icon": "assets/icon.png",
@@ -40,48 +40,48 @@
     "commands": [
       {
         "command": "aiandCopilot.setInlineSuggestionsModel",
-        "title": "Aiand: Set Inline Suggestions Model"
+        "title": "ai&: Set Inline Suggestions Model"
       },
       {
         "command": "aiandCopilot.manage",
-        "title": "Aiand: Manage Connection"
+        "title": "ai&: Manage Connection"
       },
       {
         "command": "aiandCopilot.configureApiKey",
-        "title": "Aiand: Configure API Key"
+        "title": "ai&: Configure API Key"
       },
       {
         "command": "aiandCopilot.removeApiKey",
-        "title": "Aiand: Remove API Key"
+        "title": "ai&: Remove API Key"
       },
       {
         "command": "aiandCopilot.refreshModels",
-        "title": "Aiand: Refresh Models"
+        "title": "ai&: Refresh Models"
       },
       {
         "command": "aiandCopilot.showUsage",
-        "title": "Aiand: Show Credits and Usage"
+        "title": "ai&: Show Credits and Usage"
       },
       {
         "command": "aiandCopilot.testConnection",
-        "title": "Aiand: Test Inference"
+        "title": "ai&: Test Inference"
       },
       {
         "command": "aiandCopilot.openApiKeys",
-        "title": "Aiand: Open API Keys"
+        "title": "ai&: Open API Keys"
       },
       {
         "command": "aiandCopilot.diagnostics",
-        "title": "Aiand: Show Diagnostics"
+        "title": "ai&: Show Diagnostics"
       }
     ],
     "configuration": {
-      "title": "Aiand for Copilot Chat",
+      "title": "ai& for Copilot Chat",
       "properties": {
         "aiandCopilot.inlineSuggestions": {
           "type": "boolean",
           "default": false,
-          "description": "Experimental. Provide ghost-text inline completions while typing, powered by the Aiand gateway with reasoning_effort none. Credentials, prompts, and document context are never logged."
+          "description": "Experimental. Provide ghost-text inline completions while typing, powered by the ai& gateway with reasoning_effort none. Credentials, prompts, and document context are never logged."
         },
         "aiandCopilot.inlineSuggestionsModel": {
           "type": "string",
@@ -143,48 +143,48 @@
             "Balance reasoning depth, latency, and cost.",
             "Use deeper reasoning for complex tasks."
           ],
-          "description": "Default Aiand reasoning effort. A Copilot model-picker selection overrides this value."
+          "description": "Default ai& reasoning effort. A Copilot model-picker selection overrides this value."
         },
         "aiandCopilot.maxOutputTokens": {
           "type": "number",
           "default": 0,
           "minimum": 0,
-          "description": "Maximum output tokens requested from Aiand hosted models. Use 0 to reserve up to 32,768 response tokens. Positive values are capped by the model output capability and context window."
+          "description": "Maximum output tokens requested from ai& hosted models. Use 0 to reserve up to 32,768 response tokens. Positive values are capped by the model output capability and context window."
         },
         "aiandCopilot.requestTimeoutSeconds": {
           "type": "number",
           "default": 600,
           "minimum": 10,
-          "description": "Maximum duration of a Aiand inference request in seconds."
+          "description": "Maximum duration of an ai& inference request in seconds."
         },
         "aiandCopilot.streamIdleTimeoutSeconds": {
           "type": "number",
           "default": 120,
           "minimum": 10,
-          "description": "Maximum time without receiving streamed Aiand response data before aborting a request."
+          "description": "Maximum time without receiving streamed ai& response data before aborting a request."
         },
         "aiandCopilot.catalogCacheMinutes": {
           "type": "number",
           "default": 5,
           "minimum": 1,
-          "description": "How long the Aiand hosted-model catalog is reused before refreshing."
+          "description": "How long the ai& hosted-model catalog is reused before refreshing."
         },
         "aiandCopilot.showUsageStatusBar": {
           "type": "boolean",
           "default": true,
-          "description": "Show the active Aiand account credit balance and request allowance in the status bar."
+          "description": "Show the active ai& account credit balance and request allowance in the status bar."
         },
         "aiandCopilot.debugLogging": {
           "type": "boolean",
           "default": false,
-          "description": "Log request, stream, usage, and model-discovery metadata to the Aiand output channel. Prompts and API keys are never logged."
+          "description": "Log request, stream, usage, and model-discovery metadata to the ai& output channel. Prompts and API keys are never logged."
         }
       }
     },
     "languageModelChatProviders": [
       {
         "vendor": "aiand",
-        "displayName": "Aiand",
+        "displayName": "ai&",
         "configuration": {
           "type": "object",
           "required": [
@@ -193,8 +193,8 @@
           "properties": {
             "apiKey": {
               "type": "string",
-              "title": "Aiand API Key",
-              "description": "API key for this Aiand provider entry. VS Code stores configured secrets securely.",
+              "title": "ai& API Key",
+              "description": "API key for this ai& provider entry. VS Code stores configured secrets securely.",
               "secret": true
             }
           }
