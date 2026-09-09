@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+### Patch Changes
+
+- 6813b9d: Benchmark inline-completion latency across the ai& catalog and surface measured badges in the model picker. Candidates are now ordered default-first with median TTFB/total timings from live fill-in-the-middle requests, and Kimi K2.7 Code is flagged as always-reasoning (its only accepted effort is high, so ghost text may be delayed or empty). The default model is unchanged.
+
 ## 0.2.0
 
 ### Minor Changes
