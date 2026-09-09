@@ -172,7 +172,7 @@
         "aiandCopilot.showUsageStatusBar": {
           "type": "boolean",
           "default": true,
-          "description": "Show the active ai& account credit balance and request allowance in the status bar."
+          "description": "Show the active ai& account credit balance and locally tracked request activity in the status bar."
         },
         "aiandCopilot.debugLogging": {
           "type": "boolean",

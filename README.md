@@ -20,7 +20,7 @@ This extension is a native VS Code `LanguageModelChatProvider`. It validates a u
 - API keys managed by VS Code Secret Storage or provider configuration
 - Multiple isolated ai& API-key entries in Manage Language Models
 - Current input, cached-input, and output pricing in the model picker
-- Locally tracked token activity and request history
+- Live organization credit balance with locally tracked token activity and request history
 - Live `/models` discovery with context and output limits from ai& metadata
 - Streaming text, `reasoning_content`, token usage, and function-tool calls
 - ai& reasoning effort controls only on models that advertise support

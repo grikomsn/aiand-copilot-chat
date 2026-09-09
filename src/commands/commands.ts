@@ -35,7 +35,7 @@ async function manage(auth: AiandAuth, provider: AiandProvider, output: vscode.O
         { label: "$(check) Test ai& inference", action: "test" },
         { label: "$(refresh) Refresh hosted models", action: "refresh" },
         { label: "$(zap) Set inline suggestions model", action: "inlineModel" },
-        { label: "$(history) Show usage", action: "usage" },
+        { label: "$(credit-card) Show credits and usage", action: "usage" },
         { label: "$(key) Replace API key", action: "configure" },
         { label: "$(link-external) Open ai& API keys", action: "open" },
         { label: "$(output) Show ai& logs", action: "logs" },
@@ -184,7 +184,7 @@ async function showUsage(provider: AiandProvider, output: vscode.OutputChannel):
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Window,
-        title: "Loading ai& usage…",
+        title: "Refreshing ai& credit balance and usage…",
       },
       () => provider.refreshUsage(),
     );
@@ -201,7 +201,7 @@ async function showUsage(provider: AiandProvider, output: vscode.OutputChannel):
     ] satisfies UsageQuickPickItem[],
     {
       title: "ai& usage",
-      placeHolder: "Locally tracked inference tokens",
+      placeHolder: "Live credit balance plus locally tracked inference tokens",
       matchOnDescription: true,
       matchOnDetail: true,
     },

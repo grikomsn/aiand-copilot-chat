@@ -1,8 +1,10 @@
-export const API_BASE = "https://api.aiand.com/v1";
+export const API_ORIGIN = "https://api.aiand.com";
+export const API_BASE = `${API_ORIGIN}/v1`;
 
 export const AIAND_ENDPOINTS = {
   models: `${API_BASE}/models`,
   chat: `${API_BASE}/chat/completions`,
+  balance: `${API_ORIGIN}/billing/balance`,
 } as const;
 
 export function extensionUserAgent(version: string, vscodeVersion: string): string {

@@ -1,5 +1,6 @@
 export interface AccountAllowance {
   readonly credits?: number;
+  readonly currency?: "usd" | "jpy";
   readonly usableRequests?: number | null;
 }
 export interface RequestUsage {
@@ -45,11 +46,13 @@ export interface UsageDisplayRow {
 
 export function accountUsageFromPayload(raw: unknown): AccountAllowance | undefined {
   if (!isRecord(raw)) return undefined;
-  const credits = finiteNumber(raw.credits);
+  const credits = finiteNumber(raw.balance ?? raw.credits);
+  const currency = raw.currency === "usd" || raw.currency === "jpy" ? raw.currency : undefined;
   const usableRequests = raw.usable_requests === null ? null : finiteNumber(raw.usable_requests);
   if (credits === undefined && usableRequests === undefined) return undefined;
   return {
     ...(credits === undefined ? {} : { credits }),
+    ...(currency === undefined ? {} : { currency }),
     ...(usableRequests === undefined ? {} : { usableRequests }),
   };
 }
@@ -107,7 +110,8 @@ export function toProviderUsagePayload(raw: Record<string, unknown>): ProviderUs
 }
 
 export function formatUsageStatusBar(snapshot: AiandUsageSnapshot): string {
-  if (snapshot.account?.credits !== undefined) return `$(credit-card) ai& $${formatMoney(snapshot.account.credits)}`;
+  if (snapshot.account?.credits !== undefined)
+    return `$(credit-card) ai& ${formatBalance(snapshot.account.credits, snapshot.account.currency)}`;
   if (snapshot.account?.usableRequests !== undefined && snapshot.account.usableRequests !== null)
     return `$(pulse) ai& ${compactCount(snapshot.account.usableRequests)} req`;
   if (snapshot.error) return "$(warning) ai& usage";
@@ -116,7 +120,8 @@ export function formatUsageStatusBar(snapshot: AiandUsageSnapshot): string {
 
 export function formatUsageTooltip(snapshot: AiandUsageSnapshot): string {
   const lines = ["ai& account balance and API activity"];
-  if (snapshot.account?.credits !== undefined) lines.push(`Credit balance: $${formatMoney(snapshot.account.credits)}`);
+  if (snapshot.account?.credits !== undefined)
+    lines.push(`Credit balance: ${formatBalance(snapshot.account.credits, snapshot.account.currency)}`);
   if (snapshot.account?.usableRequests === null) lines.push("Daily request allowance: pay-as-you-go account");
   else if (snapshot.account?.usableRequests !== undefined)
     lines.push(`Requests left today: ${snapshot.account.usableRequests.toLocaleString()}`);
@@ -136,7 +141,7 @@ export function formatUsageRows(snapshot: AiandUsageSnapshot): UsageDisplayRow[]
     rows.push({
       kind: "credits",
       label: "Credit balance",
-      description: `$${formatMoney(snapshot.account.credits)}`,
+      description: formatBalance(snapshot.account.credits, snapshot.account.currency),
       detail: "Available pay-as-you-go ai& credits",
     });
   if (snapshot.account?.usableRequests !== undefined)
@@ -203,6 +208,11 @@ function normalizeUsage(raw: Record<string, unknown>): Omit<RequestUsage, "model
 
 function formatMoney(value: number): string {
   return value.toFixed(4).replace(/\.?0+$/, "") || "0";
+}
+function formatBalance(value: number, currency: AccountAllowance["currency"]): string {
+  const amount = formatMoney(value);
+  if (currency === "jpy") return `¥${amount}`;
+  return `$${amount}`;
 }
 function compactCount(value: number): string {
   return value >= 1_000 ? `${Number((value / 1_000).toFixed(1))}K` : value.toLocaleString();

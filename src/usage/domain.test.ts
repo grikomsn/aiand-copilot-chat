@@ -27,7 +27,15 @@ test("normalizes ai& OpenAI-compatible usage for VS Code", () => {
   );
 });
 
-test("parses account credits and nullable daily allowance", () => {
+test("parses the ai& balance response and legacy allowance payloads", () => {
+  assert.deepEqual(accountUsageFromPayload({ balance: "42.75000000", currency: "usd" }), {
+    credits: 42.75,
+    currency: "usd",
+  });
+  assert.deepEqual(accountUsageFromPayload({ balance: "1200", currency: "jpy" }), {
+    credits: 1200,
+    currency: "jpy",
+  });
   assert.deepEqual(accountUsageFromPayload({ credits: 12.3456, usable_requests: 450 }), {
     credits: 12.3456,
     usableRequests: 450,
@@ -37,6 +45,12 @@ test("parses account credits and nullable daily allowance", () => {
     usableRequests: null,
   });
   assert.equal(accountUsageFromPayload({ plan: "free" }), undefined);
+});
+
+test("formats balances in the organization billing currency", () => {
+  assert.equal(formatUsageStatusBar({ account: { credits: 42.75, currency: "usd" } }), "$(credit-card) ai& $42.75");
+  assert.equal(formatUsageStatusBar({ account: { credits: 1200, currency: "jpy" } }), "$(credit-card) ai& ¥1200");
+  assert.equal(formatUsageRows({ account: { credits: 1200, currency: "jpy" } })[0]?.description, "¥1200");
 });
 
 test("tracks local request activity alongside the account balance", () => {

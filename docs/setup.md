@@ -25,7 +25,7 @@ Provider-entry discovery uses `https://api.aiand.com/v1/models`. Models added to
 | **ai&: Configure API Key** | Validate and securely save a legacy command-managed API key |
 | **ai&: Remove API Key** | Delete the legacy key from VS Code Secret Storage |
 | **ai&: Refresh Models** | Fetch the current model list |
-| **ai&: Show Credits and Usage** | Show locally tracked token activity |
+| **ai&: Show Credits and Usage** | Refresh the organization credit balance and show locally tracked token activity |
 | **ai&: Test Inference** | Send a small live inference request |
 | **ai&: Open API Keys** | Open the ai& dashboard |
 | **ai&: Show Diagnostics** | Show the endpoint, credential state, and registered models |
@@ -39,7 +39,7 @@ Provider-entry discovery uses `https://api.aiand.com/v1/models`. Models added to
 | `aiandCopilot.requestTimeoutSeconds` | `600` | Total inference timeout in seconds |
 | `aiandCopilot.streamIdleTimeoutSeconds` | `120` | Maximum time without streamed data |
 | `aiandCopilot.catalogCacheMinutes` | `5` | How long the live model catalog is cached |
-| `aiandCopilot.showUsageStatusBar` | `true` | Show locally tracked token activity for the active ai& entry |
+| `aiandCopilot.showUsageStatusBar` | `true` | Show the live credit balance and locally tracked token activity for the active ai& entry |
 | `aiandCopilot.debugLogging` | `false` | Log request, stream, usage, and discovery metadata |
 | `aiandCopilot.inlineSuggestions` | `false` | Experimental ghost-text inline completions while typing |
 | `aiandCopilot.inlineSuggestionsModel` | `deepseek-ai/deepseek-v4-flash` | Model used for inline completions at `reasoning_effort: none` |
@@ -66,7 +66,7 @@ Inline code suggestions are experimental and off by default. When enabled, each 
 - **An image is rejected:** select a ai& model whose live metadata advertises image input.
 - **Need a diagnostic snapshot:** run **ai&: Show Diagnostics**. The report never includes the key.
 
-The last successful model catalog and locally tracked usage snapshot are kept in VS Code global state for restart resilience. Inference retries only pre-stream network failures and HTTP 502/503/504 responses, at most twice, and honors bounded `Retry-After` delays.
+The last successful model catalog, credit balance, and locally tracked usage snapshot are kept in VS Code global state for restart resilience. The balance comes from ai&'s API-key-authenticated `/billing/balance` endpoint; request tokens and reported cost remain tracked locally from streamed usage blocks. Inference retries only pre-stream network failures and HTTP 502/503/504 responses, at most twice, and honors bounded `Retry-After` delays.
 
 The response reserve is distinct from the model's maximum output capability.
 Input plus the reserved output equals the shared context window; live positive

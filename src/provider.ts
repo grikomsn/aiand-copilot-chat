@@ -28,7 +28,7 @@ import { ModelsDevMetadata } from "./models/metadata";
 import { ChatCompletionStreamParser, validateStreamCompletion } from "./transport/sse";
 import { AIAND_ENDPOINTS, aiandHeaders } from "./transport/protocol";
 import { apiError } from "./transport/errors";
-import { recordRequestUsage, type AiandUsageSnapshot } from "./usage/domain";
+import { mergeAccountUsage, recordRequestUsage, type AiandUsageSnapshot } from "./usage/domain";
 import { apiKeyFromConfiguration, credentialRefForApiKey, qualifiedModelId } from "./provider-profile";
 import { isTransientNetworkError, isTransientServerError, retryDelayMs } from "./provider/retry";
 import { messageToText } from "./provider/messages";
@@ -336,14 +336,24 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
   }
 
   async refreshUsage(credentialRef = this.activeCredentialRef): Promise<AiandUsageSnapshot> {
-    // ai& exposes no account-balance endpoint; per-request token usage
-    // arrives in stream `usage` blocks and is tracked locally via
-    // recordRequestUsage. Refreshing therefore just stamps the cached
-    // snapshot so the UI can re-render.
-    await this.requireApiKey(false, credentialRef);
-    const next = { ...this.getUsageSnapshot(credentialRef), updatedAt: Date.now(), error: undefined };
-    this.setUsage(credentialRef, next);
-    return next;
+    const apiKey = await this.requireApiKey(false, credentialRef);
+    try {
+      const response = await fetch(AIAND_ENDPOINTS.balance, {
+        headers: this.requestHeaders(apiKey, "application/json"),
+      });
+      if (!response.ok) throw await apiError("Unable to load ai& credit balance", response);
+      const next = mergeAccountUsage(this.getUsageSnapshot(credentialRef), await response.json());
+      this.setUsage(credentialRef, next);
+      return next;
+    } catch (error) {
+      const next = {
+        ...this.getUsageSnapshot(credentialRef),
+        updatedAt: Date.now(),
+        error: messageOf(error),
+      };
+      this.setUsage(credentialRef, next);
+      throw error;
+    }
   }
 
   private async fetchModels(apiKey: string): Promise<AiandModelMetadata[]> {
