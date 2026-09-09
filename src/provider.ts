@@ -17,9 +17,11 @@ import {
   applyReasoningEffort,
   buildModelConfigurationSchema,
   contextSizeOptions,
+  modelEffortSpec,
   resolveContextCap,
   resolveContextSize,
   resolveReasoningEffort,
+  type ModelEffortSpec,
   type ReasoningEffort,
 } from "./models/options";
 import { modelPricingFields } from "./models/pricing";
@@ -41,7 +43,8 @@ export { API_BASE } from "./transport/protocol";
 export interface AiandModel extends vscode.LanguageModelChatInformation {
   rawModelId: string;
   credentialRef: string;
-  reasoningEffort: boolean;
+  /** The model's supported reasoning efforts; undefined when it has no reasoning control. */
+  effortSpec?: ModelEffortSpec;
 }
 
 export class AiandProvider implements vscode.LanguageModelChatProvider<AiandModel> {
@@ -135,18 +138,24 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
       }
     }
 
-    const defaultEffort = resolveReasoningEffort(
-      undefined,
-      this.configuration.get("reasoningEffort", DEFAULT_REASONING_EFFORT),
-    );
+    const workspaceDefault = this.configuration.get("reasoningEffort", DEFAULT_REASONING_EFFORT);
     return this.catalogFor(credentialRef).map((metadata) => {
       const pricing = modelPricingFields(metadata.cost);
       const limits = advertisedModelLimits(metadata, this.configuration.get("maxOutputTokens", 0));
+      const effortSpec = modelEffortSpec(metadata.reasoningEfforts, metadata.defaultReasoningEffort);
+      // The picker's default selection prefers the workspace default when the
+      // model supports it, else falls back to the model's own default.
+      const pickerDefault = effortSpec && effortSpec.efforts.includes(workspaceDefault as ReasoningEffort)
+        ? workspaceDefault as ReasoningEffort
+        : effortSpec?.defaultEffort;
+      const pickerSpec = effortSpec && pickerDefault
+        ? { efforts: effortSpec.efforts, defaultEffort: pickerDefault }
+        : undefined;
       return {
         id: qualifiedModelId(credentialRef, metadata.id),
         rawModelId: metadata.id,
         credentialRef,
-        reasoningEffort: metadata.reasoningEffort,
+        effortSpec,
         name: metadata.name || formatModelName(metadata.id),
         family: modelFamily(metadata.id),
         version: metadata.version,
@@ -167,10 +176,10 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
         ...(credentialRef === "legacy" && !apiKey
           ? { requiresAuthorization: { label: "Configure ai& API key" } }
           : {}),
-        ...(metadata.reasoningEffort || contextSizeOptions(limits.maxInputTokens)
+        ...(pickerSpec || contextSizeOptions(limits.maxInputTokens)
           ? {
               configurationSchema: buildModelConfigurationSchema(
-                metadata.reasoningEffort ? defaultEffort : undefined,
+                pickerSpec,
                 contextSizeOptions(limits.maxInputTokens),
               ),
             }
@@ -193,6 +202,7 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
   ): Promise<void> {
     const apiKey = await this.requireApiKey(false, model.credentialRef);
     const reasoningEffort = resolveReasoningEffort(
+      model.effortSpec,
       options.modelConfiguration,
       this.configuration.get("reasoningEffort", DEFAULT_REASONING_EFFORT),
     );
@@ -204,7 +214,6 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
       model.maxOutputTokens,
       this.configuration.get("maxOutputTokens", 0),
       Boolean(model.capabilities?.imageInput),
-      model.reasoningEffort,
       resolveContextCap(resolveContextSize(options.modelConfiguration), model.maxInputTokens),
     );
     const controller = new AbortController();
@@ -292,7 +301,9 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
     const apiKey = await this.requireApiKey(false, credentialRef);
     const models = this.catalogFor(credentialRef);
     const model = models[0]?.id ?? FALLBACK_MODELS[0];
+    const effortSpec = modelEffortSpec(models[0]?.reasoningEfforts, models[0]?.defaultReasoningEffort);
     const reasoningEffort = resolveReasoningEffort(
+      effortSpec,
       undefined,
       this.configuration.get("reasoningEffort", DEFAULT_REASONING_EFFORT),
     );
@@ -310,9 +321,7 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
     const response = await fetch(AIAND_ENDPOINTS.chat, {
       method: "POST",
       headers: this.requestHeaders(apiKey, "application/json"),
-      body: JSON.stringify(
-        models[0]?.reasoningEffort ? applyReasoningEffort(requestBody, reasoningEffort) : requestBody,
-      ),
+      body: JSON.stringify(applyReasoningEffort(requestBody, reasoningEffort)),
     });
     if (!response.ok) throw await apiError("ai& connection test failed", response);
     const responseBody = (await response.json()) as {
@@ -320,9 +329,16 @@ export class AiandProvider implements vscode.LanguageModelChatProvider<AiandMode
     };
     return {
       model,
-      ...(models[0]?.reasoningEffort ? { reasoningEffort } : {}),
+      ...(reasoningEffort ? { reasoningEffort } : {}),
       text: responseBody.choices?.[0]?.message?.content?.trim() ?? "(empty response)",
     };
+  }
+
+  /** Reasoning efforts a model accepts, from the active catalog with fallback metadata. */
+  reasoningEffortsFor(modelId: string): readonly string[] | undefined {
+    const canonical = modelId.trim().toLowerCase();
+    const live = this.catalogFor(this.activeCredentialRef).find((metadata) => metadata.id === canonical);
+    return live?.reasoningEfforts ?? undefined;
   }
 
   getActiveCredentialRef(): string {

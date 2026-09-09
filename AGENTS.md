@@ -13,7 +13,7 @@
 - `src/auth/auth.ts`: API-key Secret Storage and credential references.
 - `src/provider.ts`: VS Code provider integration, model-entry credentials, request conversion, and response reporting.
 - `src/models/catalog.ts`: hosted-model filtering, fallbacks, and display metadata.
-- `src/models/options.ts`: reasoning-effort schema, precedence, and ai& request payload translation.
+- `src/models/options.ts`: per-model reasoning-effort specs, picker schema, precedence, and ai& request payload translation.
 - `src/transport/protocol.ts`: fixed endpoints, request identity, and headers.
 - `src/transport/sse.ts`: incremental SSE parsing into text, reasoning, tool-call, and usage events.
 - `src/usage/domain.ts`: provider usage normalization for VS Code.

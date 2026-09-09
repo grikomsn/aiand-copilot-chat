@@ -134,16 +134,20 @@
             "none",
             "low",
             "medium",
-            "high"
+            "high",
+            "xhigh",
+            "max"
           ],
           "default": "high",
           "enumDescriptions": [
             "Disable model reasoning.",
             "Use less reasoning for lower latency and cost.",
             "Balance reasoning depth, latency, and cost.",
-            "Use deeper reasoning for complex tasks."
+            "Use deeper reasoning for complex tasks.",
+            "Use substantially deeper reasoning for the hardest tasks.",
+            "Use the model's maximum available reasoning."
           ],
-          "description": "Default ai& reasoning effort. A Copilot model-picker selection overrides this value."
+          "description": "Workspace default ai& reasoning effort, applied only when the selected model supports it. Each model accepts its own effort list; unsupported values fall back to the model's default. A Copilot model-picker selection overrides this value."
         },
         "aiandCopilot.maxOutputTokens": {
           "type": "number",

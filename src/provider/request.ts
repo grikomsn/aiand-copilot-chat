@@ -8,11 +8,10 @@ export function buildRequest(
   model: string,
   messages: readonly vscode.LanguageModelChatRequestMessage[],
   options: vscode.ProvideLanguageModelChatResponseOptions,
-  reasoningEffort: ReasoningEffort,
+  reasoningEffort: ReasoningEffort | undefined,
   advertisedMaxTokens: number,
   configuredMaxTokens: number,
   imageInput: boolean,
-  supportsReasoningEffort: boolean,
   contextCapTokens?: number,
 ): Record<string, unknown> {
   const maxTokens = resolveMaxOutputTokens(configuredMaxTokens, advertisedMaxTokens);
@@ -42,7 +41,7 @@ export function buildRequest(
         }
       : {}),
   };
-  return supportsReasoningEffort ? applyReasoningEffort(body, reasoningEffort) : body;
+  return applyReasoningEffort(body, reasoningEffort);
 }
 
 function sanitizeSchema(schema: unknown): Record<string, unknown> {
