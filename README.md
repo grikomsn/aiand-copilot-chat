@@ -20,7 +20,7 @@ This extension is a native VS Code `LanguageModelChatProvider`. It validates a u
 - API keys managed by VS Code Secret Storage or provider configuration
 - Multiple isolated Aiand API-key entries in Manage Language Models
 - Current input, cached-input, and output pricing in the model picker
-- Refreshable Aiand credit balance, daily request allowance, and locally tracked token activity
+- Locally tracked token activity and request history
 - Live `/models` discovery with context and output limits from Aiand metadata
 - Streaming text, `reasoning_content`, token usage, and function-tool calls
 - Aiand reasoning effort controls only on models that advertise support

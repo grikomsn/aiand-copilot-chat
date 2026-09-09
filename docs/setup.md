@@ -25,7 +25,7 @@ Provider-entry discovery uses `https://api.aiand.com/v1/models`. Models added to
 | **Aiand: Configure API Key** | Validate and securely save a legacy command-managed API key |
 | **Aiand: Remove API Key** | Delete the legacy key from VS Code Secret Storage |
 | **Aiand: Refresh Models** | Fetch the current model list |
-| **Aiand: Show Credits and Usage** | Refresh account credits and daily allowance, then show local request activity |
+| **Aiand: Show Credits and Usage** | Show locally tracked token activity |
 | **Aiand: Test Inference** | Send a small live inference request |
 | **Aiand: Open API Keys** | Open the Aiand dashboard |
 | **Aiand: Show Diagnostics** | Show the endpoint, credential state, and registered models |
@@ -39,7 +39,7 @@ Provider-entry discovery uses `https://api.aiand.com/v1/models`. Models added to
 | `aiandCopilot.requestTimeoutSeconds` | `600` | Total inference timeout in seconds |
 | `aiandCopilot.streamIdleTimeoutSeconds` | `120` | Maximum time without streamed data |
 | `aiandCopilot.catalogCacheMinutes` | `5` | How long the live model catalog is cached |
-| `aiandCopilot.showUsageStatusBar` | `true` | Show credits or daily allowance for the active Aiand entry |
+| `aiandCopilot.showUsageStatusBar` | `true` | Show locally tracked token activity for the active Aiand entry |
 | `aiandCopilot.debugLogging` | `false` | Log request, stream, usage, and discovery metadata |
 | `aiandCopilot.inlineSuggestions` | `false` | Experimental ghost-text inline completions while typing |
 | `aiandCopilot.inlineSuggestionsModel` | `deepseek-ai/deepseek-v4-flash` | Model used for inline completions at `reasoning_effort: none` |
@@ -54,9 +54,9 @@ Prompts and API keys are never intentionally written to the output channel.
 
 ## Inline suggestions
 
-Inline code suggestions are experimental and off by default. When enabled, each suggestion sends a bounded fill-in-the-middle prompt (10 lines before the cursor, 300 characters after, both configurable) with FIM delimiter tokens and `reasoning_effort: "none"` to the fixed `/chat/completions` endpoint. The live benchmark measured `deepseek-ai/deepseek-v4-flash` at 1343ms TTFB with zero hidden reasoning; `kimi-k2.6` shows a multi-second delay before its first content token even at `none`, `greg-2-super` ignores the setting and reasons anyway (1168 hidden chars), `kimi-k3-eco` streams empty responses, and `qwen3.5-9b` completes poorly — all are documented as not recommended. Hidden reasoning deltas are discarded engine-side, and the Copilot Chat prompt box is excluded unless `aiandCopilot.inlineSuggestionsChatInput` is enabled.
+Inline code suggestions are experimental and off by default. When enabled, each suggestion sends a bounded fill-in-the-middle prompt (10 lines before the cursor, 300 characters after, both configurable) with FIM delimiter tokens and `reasoning_effort: "none"` to the fixed `/chat/completions` endpoint. Inline latency has not been benchmarked against Aiand yet; candidates default to the low-latency flash tier first, larger models later. Hidden reasoning deltas are discarded engine-side, and the Copilot Chat prompt box is excluded unless `aiandCopilot.inlineSuggestionsChatInput` is enabled.
 
-**Aiand: Set Inline Suggestions Model** (also in the Manage menu) lists compatible models ordered cheap-and-fast first, each with a measured badge (for example "★ recommended · measured 1.3s TTFB") or a warning for models measured unusable (empty streams, slow first tokens, ignored `none`, or poor quality). A "Use a custom model id…" entry keeps any hosted model reachable. The command only writes settings, so changes apply on the next keystroke without a reload.
+**Aiand: Set Inline Suggestions Model** (also in the Manage menu) lists compatible models ordered cheap-and-fast first. A "Use a custom model id…" entry keeps any hosted model reachable. The command only writes settings, so changes apply on the next keystroke without a reload.
 
 ## Troubleshooting
 
@@ -66,7 +66,7 @@ Inline code suggestions are experimental and off by default. When enabled, each 
 - **An image is rejected:** select a Aiand model whose live metadata advertises image input.
 - **Need a diagnostic snapshot:** run **Aiand: Show Diagnostics**. The report never includes the key.
 
-The last successful model catalog and account-usage snapshot are kept in VS Code global state for restart resilience. Inference retries only pre-stream network failures and HTTP 502/503/504 responses, at most twice, and honors bounded `Retry-After` delays.
+The last successful model catalog and locally tracked usage snapshot are kept in VS Code global state for restart resilience. Inference retries only pre-stream network failures and HTTP 502/503/504 responses, at most twice, and honors bounded `Retry-After` delays.
 
 The response reserve is distinct from the model's maximum output capability.
 Input plus the reserved output equals the shared context window; live positive

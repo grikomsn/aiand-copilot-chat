@@ -4,10 +4,9 @@
  * Aiand exposes no FIM endpoint, so fill-in-the-middle is emulated with FIM
  * delimiter tokens inline over the fixed `/chat/completions` endpoint, and
  * reasoning is disabled with the accepted `reasoning_effort: "none"` value.
- * The live benchmark (2026-09-06) measured glm-5.3-flash at 1343ms TTFB with
- * zero hidden reasoning; models that stayed slow even at "none" (kimi-k2.6's
- * multi-second pre-content delay) or narrated instead of completing
- * (greg-2-super, qwen3.5-9b quality) are documented as not recommended.
+ * Inline latency has not been benchmarked against Aiand yet; the default
+ * flash-tier model is chosen for its low cost and latency class, not from
+ * live measurements.
  *
  * Pure and unit-tested.
  */

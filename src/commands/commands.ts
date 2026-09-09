@@ -35,7 +35,7 @@ async function manage(auth: AiandAuth, provider: AiandProvider, output: vscode.O
         { label: "$(check) Test Aiand inference", action: "test" },
         { label: "$(refresh) Refresh hosted models", action: "refresh" },
         { label: "$(zap) Set inline suggestions model", action: "inlineModel" },
-        { label: "$(credit-card) Show credits and allowance", action: "usage" },
+        { label: "$(history) Show usage", action: "usage" },
         { label: "$(key) Replace API key", action: "configure" },
         { label: "$(link-external) Open Aiand API keys", action: "open" },
         { label: "$(output) Show Aiand logs", action: "logs" },
@@ -184,7 +184,7 @@ async function showUsage(provider: AiandProvider, output: vscode.OutputChannel):
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Window,
-        title: "Refreshing Aiand credits and allowance…",
+        title: "Loading Aiand usage…",
       },
       () => provider.refreshUsage(),
     );
@@ -200,8 +200,8 @@ async function showUsage(provider: AiandProvider, output: vscode.OutputChannel):
       { label: "$(key) Configure or replace API key", action: "configure" },
     ] satisfies UsageQuickPickItem[],
     {
-      title: "Aiand credits and request allowance",
-      placeHolder: "Account balance from Aiand plus locally tracked inference tokens",
+      title: "Aiand usage",
+      placeHolder: "Locally tracked inference tokens",
       matchOnDescription: true,
       matchOnDetail: true,
     },
