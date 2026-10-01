@@ -112,12 +112,12 @@ const VENDOR_LABELS: Readonly<Record<string, string>> = {
 
 export const FALLBACK_MODEL_METADATA: readonly AiandModelMetadata[] = [
   model("openai/gpt-oss-120b", 131_072, 131_072),
-  model("deepseek-ai/deepseek-v4-flash", 1_000_000, 131_072),
-  model("deepseek-ai/deepseek-v4-pro", 1_000_000, 131_072),
-  model("moonshotai/kimi-k3", 1_000_000, 262_144),
+  model("deepseek-ai/deepseek-v4-flash", 1_048_576, 131_072),
+  model("deepseek-ai/deepseek-v4-pro", 1_048_576, 131_072),
+  model("moonshotai/kimi-k3", 1_048_576, 262_144, true),
   model("moonshotai/kimi-k2.7-code", 262_144, 262_144, true),
-  model("zai-org/glm-5.3", 1_000_000, 131_072),
-  model("zai-org/glm-5.2", 1_000_000, 131_072),
+  model("zai-org/glm-5.3", 1_048_576, 131_072),
+  model("zai-org/glm-5.2", 1_048_576, 131_072),
   model("google/gemma-4-31b-it", 262_144, 262_144, true),
   model("qwen/qwen3.8-27b", 262_144, 262_144, true),
   model("qwen/qwen3.6-27b", 262_144, 262_144, true),

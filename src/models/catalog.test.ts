@@ -40,11 +40,21 @@ test("formats model IDs for the VS Code picker", () => {
 });
 
 test("provides documented fallback limits", () => {
+  for (const id of [
+    "deepseek-ai/deepseek-v4-flash",
+    "deepseek-ai/deepseek-v4-pro",
+    "moonshotai/kimi-k3",
+    "zai-org/glm-5.3",
+    "zai-org/glm-5.2",
+  ]) {
+    assert.equal(getModelMetadata(id).contextLength, 1_048_576);
+  }
+  assert.equal(getModelMetadata("moonshotai/kimi-k3").imageInput, true);
   assert.deepEqual(getModelMetadata("zai-org/glm-5.2"), {
     id: "zai-org/glm-5.2",
     name: "GLM 5.2",
     version: "unknown",
-    contextLength: 1_000_000,
+    contextLength: 1_048_576,
     maxOutputTokens: 131_072,
     imageInput: false,
     toolCalling: true,
