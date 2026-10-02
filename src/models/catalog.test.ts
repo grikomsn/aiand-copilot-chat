@@ -25,8 +25,8 @@ test("orders documented fallback models before other discovered models", () => {
   assert.deepEqual(
     orderModels(["future-chat", "zai-org/glm-5.2", "OPENAI/GPT-OSS-120B", "openai/gpt-oss-120b"]),
     [
-      FALLBACK_MODELS[0],
-      FALLBACK_MODELS[6],
+      "openai/gpt-oss-120b",
+      "zai-org/glm-5.2",
       "future-chat",
     ],
   );
@@ -37,10 +37,14 @@ test("formats model IDs for the VS Code picker", () => {
   assert.equal(formatModelName("zai-org/glm-5.2"), "GLM 5.2");
   assert.equal(formatModelName("openai/gpt-oss-120b"), "GPT OSS 120B");
   assert.equal(formatModelName("qwen/qwen3.8-27b"), "Qwen 3.8 27B");
+  // Unknown future ids of a known vendor must not repeat the family token.
+  assert.equal(formatModelName("zai-org/glm-5.4"), "GLM 5.4");
+  assert.equal(formatModelName("deepseek-ai/deepseek-v5"), "DeepSeek V5");
 });
 
 test("provides documented fallback limits", () => {
   for (const id of [
+    "deepseek-ai/deepseek-v4.1-flash",
     "deepseek-ai/deepseek-v4-flash",
     "deepseek-ai/deepseek-v4-pro",
     "moonshotai/kimi-k3",
@@ -49,6 +53,13 @@ test("provides documented fallback limits", () => {
   ]) {
     assert.equal(getModelMetadata(id).contextLength, 1_048_576);
   }
+  assert.equal(getModelMetadata("zai-org/glm-5.3-flash").contextLength, 1_048_550);
+  assert.equal(getModelMetadata("zai-org/glm-5.3-flash").imageInput, true);
+  assert.deepEqual(getModelMetadata("zai-org/glm-5.3-flash").reasoningEfforts, ["low", "high", "max"]);
+  assert.equal(getModelMetadata("zai-org/glm-5.3-flash").defaultReasoningEffort, "low");
+  assert.equal(getModelMetadata("deepseek-ai/deepseek-v4.1-flash").imageInput, true);
+  assert.equal(getModelMetadata("deepseek-ai/deepseek-v4.1-flash").defaultReasoningEffort, "high");
+  assert.equal(getModelMetadata("deepseek-ai/deepseek-v4.1-flash").maxOutputTokens, 384_000);
   assert.equal(getModelMetadata("moonshotai/kimi-k3").imageInput, true);
   assert.deepEqual(getModelMetadata("zai-org/glm-5.2"), {
     id: "zai-org/glm-5.2",

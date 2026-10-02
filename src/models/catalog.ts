@@ -4,10 +4,12 @@ import type { ReasoningEffort } from "./options";
 
 export const FALLBACK_MODELS = [
   "openai/gpt-oss-120b",
+  "deepseek-ai/deepseek-v4.1-flash",
   "deepseek-ai/deepseek-v4-flash",
   "deepseek-ai/deepseek-v4-pro",
   "moonshotai/kimi-k3",
   "moonshotai/kimi-k2.7-code",
+  "zai-org/glm-5.3-flash",
   "zai-org/glm-5.3",
   "zai-org/glm-5.2",
   "google/gemma-4-31b-it",
@@ -30,10 +32,12 @@ const FALLBACK_REASONING_EFFORTS: Readonly<Record<string, {
   readonly defaultEffort: ReasoningEffort;
 }>> = {
   "openai/gpt-oss-120b": { efforts: ["low", "medium", "high"], defaultEffort: "medium" },
+  "deepseek-ai/deepseek-v4.1-flash": { efforts: ["none", "high", "max"], defaultEffort: "high" },
   "deepseek-ai/deepseek-v4-flash": { efforts: ["none", "high", "max"], defaultEffort: "none" },
   "deepseek-ai/deepseek-v4-pro": { efforts: ["none", "high", "max"], defaultEffort: "none" },
   "moonshotai/kimi-k3": { efforts: ["low", "high", "max"], defaultEffort: "max" },
   "moonshotai/kimi-k2.7-code": { efforts: ["high"], defaultEffort: "high" },
+  "zai-org/glm-5.3-flash": { efforts: ["low", "high", "max"], defaultEffort: "low" },
   "zai-org/glm-5.3": { efforts: ["low", "high", "max"], defaultEffort: "max" },
   "zai-org/glm-5.2": { efforts: ["none", "high", "max"], defaultEffort: "max" },
   "google/gemma-4-31b-it": { efforts: ["none", "high"], defaultEffort: "none" },
@@ -88,10 +92,12 @@ export interface AiandApiModel {
 
 const OFFICIAL_MODEL_NAMES: Readonly<Record<string, string>> = {
   "openai/gpt-oss-120b": "GPT OSS 120B",
+  "deepseek-ai/deepseek-v4.1-flash": "DeepSeek V4.1 Flash",
   "deepseek-ai/deepseek-v4-flash": "DeepSeek V4 Flash",
   "deepseek-ai/deepseek-v4-pro": "DeepSeek V4 Pro",
   "moonshotai/kimi-k3": "Kimi K3",
   "moonshotai/kimi-k2.7-code": "Kimi K2.7 Code",
+  "zai-org/glm-5.3-flash": "GLM 5.3 Flash",
   "zai-org/glm-5.3": "GLM 5.3",
   "zai-org/glm-5.2": "GLM 5.2",
   "google/gemma-4-31b-it": "Gemma 4 31B IT",
@@ -112,10 +118,15 @@ const VENDOR_LABELS: Readonly<Record<string, string>> = {
 
 export const FALLBACK_MODEL_METADATA: readonly AiandModelMetadata[] = [
   model("openai/gpt-oss-120b", 131_072, 131_072),
+  // Output ceiling from the models.dev `aiand` snapshot; live `/v1/models`
+  // advertises no max-output field for any model.
+  model("deepseek-ai/deepseek-v4.1-flash", 1_048_576, 384_000, true),
   model("deepseek-ai/deepseek-v4-flash", 1_048_576, 131_072),
   model("deepseek-ai/deepseek-v4-pro", 1_048_576, 131_072),
   model("moonshotai/kimi-k3", 1_048_576, 262_144, true),
   model("moonshotai/kimi-k2.7-code", 262_144, 262_144, true),
+  // Live context_window is 1,048,550, slightly under the 1M of glm-5.3.
+  model("zai-org/glm-5.3-flash", 1_048_550, 131_072, true),
   model("zai-org/glm-5.3", 1_048_576, 131_072),
   model("zai-org/glm-5.2", 1_048_576, 131_072),
   model("google/gemma-4-31b-it", 262_144, 262_144, true),
@@ -212,9 +223,15 @@ export function formatModelName(id: string): string {
   const vendor = VENDOR_LABELS[namespaced[0] ?? ""];
   const modelPart = namespaced.length > 1 ? namespaced.slice(1).join("-") : canonical;
   const parts = modelPart.split("-");
-  const rest = vendor && parts[0]?.toLowerCase().startsWith(namespaced[0].split("-")[0] ?? "")
-    ? parts.slice(1)
-    : parts;
+  // Strip the leading family token when it repeats the vendor label, so an
+  // unknown future id like "zai-org/glm-5.4" renders "GLM 5.4" rather than
+  // "GLM GLM 5.4". Exact ids stay covered by OFFICIAL_MODEL_NAMES above.
+  const vendorStem = (namespaced[0] ?? "").split("-")[0];
+  const familyRepeatsVendor = vendor !== undefined && (
+    (parts[0]?.toLowerCase().startsWith(vendorStem) ?? false)
+    || parts[0]?.toLowerCase() === vendor.toLowerCase()
+  );
+  const rest = familyRepeatsVendor ? parts.slice(1) : parts;
   // Qwen families embed the version in the family name (qwen3.8) and keep the
   // parameter count together (27b), so render the family and model separately.
   if (parts[0]?.startsWith("qwen") && !vendor) {
