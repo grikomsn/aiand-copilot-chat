@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3
+
+### Patch Changes
+
+- 46c8fdd: Align offline model context limits and Kimi K3 vision support with the live ai& catalog.
+- f73570b: Add DeepSeek V4.1 Flash and GLM 5.3 Flash to the offline model snapshot with their live context windows, vision support, reasoning defaults, and published rates, and render future ids of a known vendor without repeating the family name.
+
 ## 0.2.2
 
 ### Patch Changes
