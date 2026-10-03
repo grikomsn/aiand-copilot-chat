@@ -1,3 +1,9 @@
+> **Archived — development has moved to ai&.**
+>
+> The official ai& team has acquired/imported this project into [aiandlabs/aiand-copilot-chat](https://github.com/aiandlabs/aiand-copilot-chat). This repository is retained as a read-only historical archive and is no longer maintained.
+>
+> The original `grikomsn.aiand-copilot-chat` extension has been unpublished from the Visual Studio Marketplace. Follow the [official upstream repository](https://github.com/aiandlabs/aiand-copilot-chat) for current installation instructions, releases, support, and contributions. The documentation below describes the historical extension.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/grikomsn/aiand-copilot-chat/main/assets/cover.jpg" alt="ai& and GitHub Copilot" width="960">
 </p>
@@ -7,7 +13,6 @@
 <p align="center">Use ai& models directly from the GitHub Copilot Chat model picker in Visual Studio Code.</p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=grikomsn.aiand-copilot-chat"><img src="https://img.shields.io/visual-studio-marketplace/v/grikomsn.aiand-copilot-chat?style=flat-square&logo=visualstudiocode&label=Marketplace" alt="Visual Studio Marketplace version"></a>
   <a href="https://github.com/grikomsn/aiand-copilot-chat/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/grikomsn/aiand-copilot-chat/ci.yml?branch=main&style=flat-square&label=CI" alt="CI status"></a>
   <a href="https://github.com/grikomsn/aiand-copilot-chat/blob/main/LICENSE"><img src="https://img.shields.io/github/license/grikomsn/aiand-copilot-chat?style=flat-square" alt="MIT license"></a>
 </p>
@@ -29,7 +34,7 @@ This extension is a native VS Code `LanguageModelChatProvider`. It validates a u
 
 ## Quick start
 
-1. Install the extension. You need VS Code 1.125 or newer and GitHub Copilot Chat.
+1. For current installation instructions, see the [official upstream repository](https://github.com/aiandlabs/aiand-copilot-chat). The historical extension requires VS Code 1.125 or newer and GitHub Copilot Chat.
 2. Create an API key in the [ai& dashboard](https://console.aiand.com/settings/api-keys).
 3. Open Copilot Chat, select **Manage Models**, add a **ai&** provider entry, and enter the key.
 4. Choose any model returned by your ai& account.
@@ -53,4 +58,4 @@ For models that support configurable reasoning, choose **None**, **Low**, **Medi
 - [OpenCode for GitHub Copilot Chat](https://github.com/grikomsn/opencode-copilot-chat)
 - [Poolside for GitHub Copilot Chat](https://github.com/grikomsn/poolside-copilot-chat)
 
-Unofficial project; not affiliated with ai&, GitHub, or Microsoft. ai& usage limits and charges still apply. Licensed under [MIT](LICENSE).
+This archive preserves the original community project. Active development is now maintained by the [official ai& team](https://github.com/aiandlabs/aiand-copilot-chat). This historical extension is not affiliated with GitHub or Microsoft. ai& usage limits and charges still apply. Licensed under [MIT](LICENSE).

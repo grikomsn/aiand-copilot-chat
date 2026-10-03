@@ -1,10 +1,12 @@
 # Contributing
 
-Thanks for helping improve ai& for GitHub Copilot Chat.
+This repository is archived for history and no longer accepts contributions. Please direct issues, support requests, and pull requests to the [official ai& upstream repository](https://github.com/aiandlabs/aiand-copilot-chat). Follow its current contributing guidance.
+
+The instructions below are retained for historical reference.
 
 ## Before opening work
 
-- Use [Discussions](https://github.com/grikomsn/aiand-copilot-chat/discussions/categories/q-a) for setup and usage questions.
+- Use [Discussions](https://github.com/aiandlabs/aiand-copilot-chat) for setup and usage questions.
 - Search existing issues before filing a bug or feature request.
 - Report vulnerabilities according to [SECURITY.md](SECURITY.md), not in a public issue.
 - Keep changes focused. Open an issue first when a proposal changes credential storage, provider behavior, or public configuration.

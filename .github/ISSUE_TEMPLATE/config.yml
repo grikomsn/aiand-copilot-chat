@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/grikomsn/aiand-copilot-chat/security/policy
+    url: https://github.com/aiandlabs/aiand-copilot-chat/blob/main/SECURITY.md
     about: Review the private reporting instructions; do not disclose vulnerabilities publicly.
   - name: Questions and support
-    url: https://github.com/grikomsn/aiand-copilot-chat/discussions/new?category=q-a
-    about: Ask setup and usage questions in Discussions.
+    url: https://github.com/aiandlabs/aiand-copilot-chat
+    about: Follow the official upstream repository for support and contributions.

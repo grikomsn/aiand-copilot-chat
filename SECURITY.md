@@ -2,11 +2,11 @@
 
 ## Supported versions
 
-Security fixes target the latest version published on the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=grikomsn.aiand-copilot-chat). Update to the latest release before reporting an issue that may already be fixed.
+This repository is a historical archive and no longer receives security fixes. The original Marketplace extension has been unpublished. For maintained versions and current reporting instructions, consult the [official upstream security policy](https://github.com/aiandlabs/aiand-copilot-chat/blob/main/SECURITY.md).
 
 ## Reporting a vulnerability
 
-Email [security@nibras.co](mailto:security@nibras.co). Do not open a public issue or discussion.
+For vulnerabilities specific to this historical code, email [security@nibras.co](mailto:security@nibras.co). Do not open a public issue or discussion.
 
 Include, when applicable:
 
